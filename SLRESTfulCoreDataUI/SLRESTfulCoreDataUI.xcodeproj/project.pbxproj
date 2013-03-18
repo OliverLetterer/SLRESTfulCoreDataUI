@@ -1,0 +1,418 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A70322BE16F79DFA0036A0F3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A70322BD16F79DFA0036A0F3 /* Foundation.framework */; };
+		A70322C316F79DFA0036A0F3 /* SLRESTfulCoreDataUI.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = A70322C216F79DFA0036A0F3 /* SLRESTfulCoreDataUI.h */; };
+		A70322C516F79DFA0036A0F3 /* SLRESTfulCoreDataUI.m in Sources */ = {isa = PBXBuildFile; fileRef = A70322C416F79DFA0036A0F3 /* SLRESTfulCoreDataUI.m */; };
+		A70322CD16F79DFB0036A0F3 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A70322CC16F79DFB0036A0F3 /* SenTestingKit.framework */; };
+		A70322CF16F79DFB0036A0F3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A70322CE16F79DFB0036A0F3 /* UIKit.framework */; };
+		A70322D016F79DFB0036A0F3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A70322BD16F79DFA0036A0F3 /* Foundation.framework */; };
+		A70322D316F79DFB0036A0F3 /* libSLRESTfulCoreDataUI.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A70322BA16F79DFA0036A0F3 /* libSLRESTfulCoreDataUI.a */; };
+		A70322D916F79DFB0036A0F3 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A70322D716F79DFB0036A0F3 /* InfoPlist.strings */; };
+		A70322DC16F79DFB0036A0F3 /* SLRESTfulCoreDataUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = A70322DB16F79DFB0036A0F3 /* SLRESTfulCoreDataUITests.m */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A70322D116F79DFB0036A0F3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A70322B216F79DFA0036A0F3 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A70322B916F79DFA0036A0F3;
+			remoteInfo = SLRESTfulCoreDataUI;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		A70322B816F79DFA0036A0F3 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "include/${PRODUCT_NAME}";
+			dstSubfolderSpec = 16;
+			files = (
+				A70322C316F79DFA0036A0F3 /* SLRESTfulCoreDataUI.h in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		A70322BA16F79DFA0036A0F3 /* libSLRESTfulCoreDataUI.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libSLRESTfulCoreDataUI.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		A70322BD16F79DFA0036A0F3 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		A70322C116F79DFA0036A0F3 /* SLRESTfulCoreDataUI-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SLRESTfulCoreDataUI-Prefix.pch"; sourceTree = "<group>"; };
+		A70322C216F79DFA0036A0F3 /* SLRESTfulCoreDataUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SLRESTfulCoreDataUI.h; sourceTree = "<group>"; };
+		A70322C416F79DFA0036A0F3 /* SLRESTfulCoreDataUI.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SLRESTfulCoreDataUI.m; sourceTree = "<group>"; };
+		A70322CB16F79DFB0036A0F3 /* SLRESTfulCoreDataUITests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SLRESTfulCoreDataUITests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A70322CC16F79DFB0036A0F3 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
+		A70322CE16F79DFB0036A0F3 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
+		A70322D616F79DFB0036A0F3 /* SLRESTfulCoreDataUITests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SLRESTfulCoreDataUITests-Info.plist"; sourceTree = "<group>"; };
+		A70322D816F79DFB0036A0F3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		A70322DA16F79DFB0036A0F3 /* SLRESTfulCoreDataUITests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SLRESTfulCoreDataUITests.h; sourceTree = "<group>"; };
+		A70322DB16F79DFB0036A0F3 /* SLRESTfulCoreDataUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SLRESTfulCoreDataUITests.m; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A70322B716F79DFA0036A0F3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A70322BE16F79DFA0036A0F3 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A70322C716F79DFB0036A0F3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A70322CD16F79DFB0036A0F3 /* SenTestingKit.framework in Frameworks */,
+				A70322CF16F79DFB0036A0F3 /* UIKit.framework in Frameworks */,
+				A70322D016F79DFB0036A0F3 /* Foundation.framework in Frameworks */,
+				A70322D316F79DFB0036A0F3 /* libSLRESTfulCoreDataUI.a in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A70322B116F79DFA0036A0F3 = {
+			isa = PBXGroup;
+			children = (
+				A70322BF16F79DFA0036A0F3 /* SLRESTfulCoreDataUI */,
+				A70322D416F79DFB0036A0F3 /* SLRESTfulCoreDataUITests */,
+				A70322BC16F79DFA0036A0F3 /* Frameworks */,
+				A70322BB16F79DFA0036A0F3 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A70322BB16F79DFA0036A0F3 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A70322BA16F79DFA0036A0F3 /* libSLRESTfulCoreDataUI.a */,
+				A70322CB16F79DFB0036A0F3 /* SLRESTfulCoreDataUITests.octest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A70322BC16F79DFA0036A0F3 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				A70322BD16F79DFA0036A0F3 /* Foundation.framework */,
+				A70322CC16F79DFB0036A0F3 /* SenTestingKit.framework */,
+				A70322CE16F79DFB0036A0F3 /* UIKit.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		A70322BF16F79DFA0036A0F3 /* SLRESTfulCoreDataUI */ = {
+			isa = PBXGroup;
+			children = (
+				A70322C216F79DFA0036A0F3 /* SLRESTfulCoreDataUI.h */,
+				A70322C416F79DFA0036A0F3 /* SLRESTfulCoreDataUI.m */,
+				A70322C016F79DFA0036A0F3 /* Supporting Files */,
+			);
+			path = SLRESTfulCoreDataUI;
+			sourceTree = "<group>";
+		};
+		A70322C016F79DFA0036A0F3 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				A70322C116F79DFA0036A0F3 /* SLRESTfulCoreDataUI-Prefix.pch */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		A70322D416F79DFB0036A0F3 /* SLRESTfulCoreDataUITests */ = {
+			isa = PBXGroup;
+			children = (
+				A70322DA16F79DFB0036A0F3 /* SLRESTfulCoreDataUITests.h */,
+				A70322DB16F79DFB0036A0F3 /* SLRESTfulCoreDataUITests.m */,
+				A70322D516F79DFB0036A0F3 /* Supporting Files */,
+			);
+			path = SLRESTfulCoreDataUITests;
+			sourceTree = "<group>";
+		};
+		A70322D516F79DFB0036A0F3 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				A70322D616F79DFB0036A0F3 /* SLRESTfulCoreDataUITests-Info.plist */,
+				A70322D716F79DFB0036A0F3 /* InfoPlist.strings */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A70322B916F79DFA0036A0F3 /* SLRESTfulCoreDataUI */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A70322DF16F79DFB0036A0F3 /* Build configuration list for PBXNativeTarget "SLRESTfulCoreDataUI" */;
+			buildPhases = (
+				A70322B616F79DFA0036A0F3 /* Sources */,
+				A70322B716F79DFA0036A0F3 /* Frameworks */,
+				A70322B816F79DFA0036A0F3 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SLRESTfulCoreDataUI;
+			productName = SLRESTfulCoreDataUI;
+			productReference = A70322BA16F79DFA0036A0F3 /* libSLRESTfulCoreDataUI.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+		A70322CA16F79DFB0036A0F3 /* SLRESTfulCoreDataUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A70322E216F79DFB0036A0F3 /* Build configuration list for PBXNativeTarget "SLRESTfulCoreDataUITests" */;
+			buildPhases = (
+				A70322C616F79DFB0036A0F3 /* Sources */,
+				A70322C716F79DFB0036A0F3 /* Frameworks */,
+				A70322C816F79DFB0036A0F3 /* Resources */,
+				A70322C916F79DFB0036A0F3 /* ShellScript */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A70322D216F79DFB0036A0F3 /* PBXTargetDependency */,
+			);
+			name = SLRESTfulCoreDataUITests;
+			productName = SLRESTfulCoreDataUITests;
+			productReference = A70322CB16F79DFB0036A0F3 /* SLRESTfulCoreDataUITests.octest */;
+			productType = "com.apple.product-type.bundle";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A70322B216F79DFA0036A0F3 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0460;
+				ORGANIZATIONNAME = "Sparrow-Labs";
+			};
+			buildConfigurationList = A70322B516F79DFA0036A0F3 /* Build configuration list for PBXProject "SLRESTfulCoreDataUI" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = A70322B116F79DFA0036A0F3;
+			productRefGroup = A70322BB16F79DFA0036A0F3 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A70322B916F79DFA0036A0F3 /* SLRESTfulCoreDataUI */,
+				A70322CA16F79DFB0036A0F3 /* SLRESTfulCoreDataUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A70322C816F79DFB0036A0F3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A70322D916F79DFB0036A0F3 /* InfoPlist.strings in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A70322C916F79DFB0036A0F3 /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# Run the unit tests in this test bundle.\n\"${SYSTEM_DEVELOPER_DIR}/Tools/RunUnitTests\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A70322B616F79DFA0036A0F3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A70322C516F79DFA0036A0F3 /* SLRESTfulCoreDataUI.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A70322C616F79DFB0036A0F3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A70322DC16F79DFB0036A0F3 /* SLRESTfulCoreDataUITests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A70322D216F79DFB0036A0F3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A70322B916F79DFA0036A0F3 /* SLRESTfulCoreDataUI */;
+			targetProxy = A70322D116F79DFB0036A0F3 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		A70322D716F79DFB0036A0F3 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A70322D816F79DFB0036A0F3 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		A70322DD16F79DFB0036A0F3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		A70322DE16F79DFB0036A0F3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 6.1;
+				SDKROOT = iphoneos;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		A70322E016F79DFB0036A0F3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/SLRESTfulCoreDataUI.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "SLRESTfulCoreDataUI/SLRESTfulCoreDataUI-Prefix.pch";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		A70322E116F79DFB0036A0F3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				DSTROOT = /tmp/SLRESTfulCoreDataUI.dst;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "SLRESTfulCoreDataUI/SLRESTfulCoreDataUI-Prefix.pch";
+				OTHER_LDFLAGS = "-ObjC";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
+		A70322E316F79DFB0036A0F3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
+					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "SLRESTfulCoreDataUI/SLRESTfulCoreDataUI-Prefix.pch";
+				INFOPLIST_FILE = "SLRESTfulCoreDataUITests/SLRESTfulCoreDataUITests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Debug;
+		};
+		A70322E416F79DFB0036A0F3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				FRAMEWORK_SEARCH_PATHS = (
+					"\"$(SDKROOT)/Developer/Library/Frameworks\"",
+					"\"$(DEVELOPER_LIBRARY_DIR)/Frameworks\"",
+				);
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "SLRESTfulCoreDataUI/SLRESTfulCoreDataUI-Prefix.pch";
+				INFOPLIST_FILE = "SLRESTfulCoreDataUITests/SLRESTfulCoreDataUITests-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = octest;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A70322B516F79DFA0036A0F3 /* Build configuration list for PBXProject "SLRESTfulCoreDataUI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A70322DD16F79DFB0036A0F3 /* Debug */,
+				A70322DE16F79DFB0036A0F3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A70322DF16F79DFB0036A0F3 /* Build configuration list for PBXNativeTarget "SLRESTfulCoreDataUI" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A70322E016F79DFB0036A0F3 /* Debug */,
+				A70322E116F79DFB0036A0F3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		A70322E216F79DFB0036A0F3 /* Build configuration list for PBXNativeTarget "SLRESTfulCoreDataUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A70322E316F79DFB0036A0F3 /* Debug */,
+				A70322E416F79DFB0036A0F3 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A70322B216F79DFA0036A0F3 /* Project object */;
+}
