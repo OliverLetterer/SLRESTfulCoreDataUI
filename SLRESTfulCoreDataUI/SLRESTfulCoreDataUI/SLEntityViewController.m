@@ -650,6 +650,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     
     if (self.completionHandler) {
         self.completionHandler(NO);
+        self.completionHandler = NULL;
     }
 }
 
@@ -681,6 +682,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         
         if (self.completionHandler) {
             self.completionHandler(YES);
+            self.completionHandler = NULL;
         }
     };
     
