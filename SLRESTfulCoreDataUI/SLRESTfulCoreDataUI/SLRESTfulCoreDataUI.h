@@ -11,3 +11,4 @@
 #import "SLEntityTextFieldCell.h"
 #import "SLEntitySwitchCell.h"
 #import "SLSelectEntityAttributeViewControllerProtocol.h"
+#import "SLSelectRelationshipEntityViewController.h"

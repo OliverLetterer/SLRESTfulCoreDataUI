@@ -36,7 +36,6 @@ typedef NS_ENUM(NSUInteger, SLEntityViewControllerEditingType) {
 /**
  managing keyboard types for attributes
  */
-+ (void)setDefaultKeyboardType:(UIKeyboardType)keyboardType forAttribute:(NSString *)attribute ofEntity:(Class)entity;
 - (void)setKeyboardType:(UIKeyboardType)keyboardType forAttribute:(NSString *)attribute;
 - (UIKeyboardType)keyboardTypeForAttribute:(NSString *)attribute;
 
@@ -48,6 +47,15 @@ typedef NS_ENUM(NSUInteger, SLEntityViewControllerEditingType) {
  */
 - (void)setViewControllerClass:(Class)viewControllerClass forAttribute:(NSString *)attribute;
 - (Class)viewControllerClassForAttribute:(NSString *)attribute;
+
+/**
+ Configuring selection of relationships. fetchedResultsController will be used to display possible entities for the given relationship. nameKeyPath will be used as the name for each relationship entity.
+ */
+- (void)setFetchedResultsController:(NSFetchedResultsController *)fetchedResultsController forRelationship:(NSString *)relationship;
+- (NSFetchedResultsController *)fetchedResultsControllerForRelationship:(NSString *)relationship;
+
+- (void)setNameKeyPath:(NSString *)nameKeyPath forRelationship:(NSString *)relationship;
+- (NSString *)nameKeyPathForRelationship:(NSString *)relationship;
 
 - (id)initWithEntity:(NSManagedObject *)entity editingType:(SLEntityViewControllerEditingType)editingType;
 

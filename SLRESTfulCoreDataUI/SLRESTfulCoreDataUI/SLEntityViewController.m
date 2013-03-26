@@ -11,11 +11,11 @@
 #import "SLEntityTextFieldCell.h"
 #import "SLEntitySwitchCell.h"
 #import "SLSelectEntityAttributeViewControllerProtocol.h"
+#import "SLSelectRelationshipEntityViewController.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
 
 char *const SLEntityViewControllerAttributeDescriptionKey;
-static NSMutableDictionary *defaultKeyboardTypes;
 
 
 
@@ -29,6 +29,8 @@ static NSMutableDictionary *defaultKeyboardTypes;
 
 @property (nonatomic, strong) NSMutableDictionary *keyboardTypes;
 @property (nonatomic, strong) NSMutableDictionary *viewControllerClasses;
+@property (nonatomic, strong) NSMutableDictionary *fetchedResultsControllers;
+@property (nonatomic, strong) NSMutableDictionary *relationshipNameKeyPaths;
 
 @property (nonatomic, strong) NSEntityDescription *entityDescription;
 @property (nonatomic, strong) NSDictionary *propertyDescriptions;
@@ -56,6 +58,24 @@ static NSMutableDictionary *defaultKeyboardTypes;
     }
     
     return _viewControllerClasses;
+}
+
+- (NSMutableDictionary *)fetchedResultsControllers
+{
+    if (!_fetchedResultsControllers) {
+        _fetchedResultsControllers = [NSMutableDictionary dictionary];
+    }
+    
+    return _fetchedResultsControllers;
+}
+
+- (NSMutableDictionary *)relationshipNameKeyPaths
+{
+    if (!_relationshipNameKeyPaths) {
+        _relationshipNameKeyPaths = [NSMutableDictionary dictionary];
+    }
+    
+    return _relationshipNameKeyPaths;
 }
 
 - (NSMutableDictionary *)keyboardTypes
@@ -102,15 +122,6 @@ static NSMutableDictionary *defaultKeyboardTypes;
 }
 
 #pragma mark - Initialization
-
-+ (void)initialize
-{
-    if (self != [SLEntityViewController class]) {
-        return;
-    }
-    
-    defaultKeyboardTypes = [NSMutableDictionary dictionary];
-}
 
 - (id)initWithEntity:(NSManagedObject *)entity editingType:(SLEntityViewControllerEditingType)editingType
 {
@@ -289,7 +300,17 @@ static NSMutableDictionary *defaultKeyboardTypes;
             return;
         }
     } else if ([propertyDescription isKindOfClass:[NSRelationshipDescription class]]) {
+        NSRelationshipDescription *relationshipDescription = propertyDescription;
+        NSFetchedResultsController *fetchedResultsController = [self fetchedResultsControllerForRelationship:relationshipDescription.name];
+        NSString *nameKeyPath = [self nameKeyPathForRelationship:relationshipDescription.name];
         
+        SLSelectRelationshipEntityViewController *viewController = [[SLSelectRelationshipEntityViewController alloc] initWithFetchedResultsController:fetchedResultsController
+                                                                                                                              relationshipDescription:relationshipDescription
+                                                                                                                                               entity:self.entity
+                                                                                                                                       keyPathForName:nameKeyPath];
+        viewController.title = self.propertyMapping[relationshipDescription.name];
+        [self.navigationController pushViewController:viewController animated:YES];
+        return;
     }
     
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
@@ -380,10 +401,10 @@ static NSMutableDictionary *defaultKeyboardTypes;
     return nil;
 }
 
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRelationshipDescription:(NSAttributeDescription *)attributeDescription atIndexPath:(NSIndexPath *)indexPath
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRelationshipDescription:(NSRelationshipDescription *)relationshipDescription atIndexPath:(NSIndexPath *)indexPath
 {
-    NSString *firstLetter = [attributeDescription.name substringToIndex:1];
-    NSString *restString = [attributeDescription.name substringFromIndex:1];
+    NSString *firstLetter = [relationshipDescription.name substringToIndex:1];
+    NSString *restString = [relationshipDescription.name substringFromIndex:1];
     
     NSString *selectorName = [NSString stringWithFormat:@"tableView:cellFor%@%@AtIndexPath:", firstLetter.uppercaseString, restString];
     SEL selector = NSSelectorFromString(selectorName);
@@ -399,23 +420,16 @@ static NSMutableDictionary *defaultKeyboardTypes;
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
     }
     
-    cell.textLabel.text = self.propertyMapping[attributeDescription.name];
+    NSString *nameKeyPath = [self nameKeyPathForRelationship:relationshipDescription.name];
+    
+    cell.textLabel.text = self.propertyMapping[relationshipDescription.name];
+    cell.detailTextLabel.text = [[self.entity valueForKey:relationshipDescription.name] valueForKey:nameKeyPath];
+    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     
     return cell;
 }
 
 #pragma mark - Instance methods
-
-+ (void)setDefaultKeyboardType:(UIKeyboardType)keyboardType forAttribute:(NSString *)attribute ofEntity:(Class)entity
-{
-    NSMutableDictionary *keyboardTypes = defaultKeyboardTypes[NSStringFromClass(entity)];
-    if (!keyboardType) {
-        keyboardType = [NSMutableDictionary dictionary];
-        defaultKeyboardTypes[NSStringFromClass(entity)] = keyboardTypes;
-    }
-    
-    keyboardTypes[attribute] = @(keyboardType);
-}
 
 - (void)setKeyboardType:(UIKeyboardType)keyboardType forAttribute:(NSString *)attribute
 {
@@ -428,19 +442,6 @@ static NSMutableDictionary *defaultKeyboardTypes;
     
     if (registeredKeyboardType) {
         return registeredKeyboardType.integerValue;
-    }
-    
-    Class currentClass = [self.entity class];
-    while (currentClass != Nil) {
-        NSDictionary *keyboardTypes = defaultKeyboardTypes[NSStringFromClass(currentClass)];
-        
-        NSNumber *registeredKeyboardType = keyboardTypes[attribute];
-        
-        if (registeredKeyboardType) {
-            return registeredKeyboardType.integerValue;
-        }
-        
-        currentClass = class_getSuperclass(currentClass);
     }
     
     NSAttributeDescription *attributeDescription = self.propertyDescriptions[attribute];
@@ -546,6 +547,26 @@ static NSMutableDictionary *defaultKeyboardTypes;
     }
     
     return NSClassFromString(className);
+}
+
+- (void)setFetchedResultsController:(NSFetchedResultsController *)fetchedResultsController forRelationship:(NSString *)relationship
+{
+    self.fetchedResultsControllers[relationship] = fetchedResultsController;
+}
+
+- (NSFetchedResultsController *)fetchedResultsControllerForRelationship:(NSString *)relationship
+{
+    return self.fetchedResultsControllers[relationship];
+}
+
+- (void)setNameKeyPath:(NSString *)nameKeyPath forRelationship:(NSString *)relationship
+{
+    self.relationshipNameKeyPaths[relationship] = nameKeyPath;
+}
+
+- (NSString *)nameKeyPathForRelationship:(NSString *)relationship
+{
+    return self.relationshipNameKeyPaths[relationship];
 }
 
 #pragma mark - UIViewControllerRestoration
