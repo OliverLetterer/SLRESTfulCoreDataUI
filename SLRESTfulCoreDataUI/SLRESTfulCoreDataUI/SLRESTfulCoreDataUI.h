@@ -6,8 +6,8 @@
 //  Copyright (c) 2013 Sparrow-Labs. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
-
-@interface SLRESTfulCoreDataUI : NSObject
-
-@end
+#import "CTRESTfulCoreData.h"
+#import "SLEntityViewController.h"
+#import "SLEntityTextFieldCell.h"
+#import "SLEntitySwitchCell.h"
+#import "SLSelectEntityAttributeViewControllerProtocol.h"
