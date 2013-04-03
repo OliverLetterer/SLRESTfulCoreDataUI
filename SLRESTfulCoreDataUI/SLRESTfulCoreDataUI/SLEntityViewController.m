@@ -444,6 +444,10 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         return registeredKeyboardType.integerValue;
     }
     
+    if ([attribute isEqualToString:@"price"]) {
+        DLog(@"");
+    }
+    
     NSAttributeDescription *attributeDescription = self.propertyDescriptions[attribute];
 
     switch (attributeDescription.attributeType) {
@@ -458,7 +462,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         case NSDoubleAttributeType:
         case NSFloatAttributeType:
         case NSDecimalAttributeType:
-            return UIKeyboardTypeDecimalPad;
+            return UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPhone ? UIKeyboardTypeDecimalPad : UIKeyboardTypeNumbersAndPunctuation;
             break;
         default:
             break;
