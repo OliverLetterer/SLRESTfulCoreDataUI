@@ -6,7 +6,7 @@
 //  Copyright (c) 2013 Sparrow-Labs. All rights reserved.
 //
 
-#import "CTRESTfulCoreData.h"
+#import "SLRESTfulCoreData.h"
 #import "SLEntityViewController.h"
 #import "SLEntityTextFieldCell.h"
 #import "SLEntitySwitchCell.h"

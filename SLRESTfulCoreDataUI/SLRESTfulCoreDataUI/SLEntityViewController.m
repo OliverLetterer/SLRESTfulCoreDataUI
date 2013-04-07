@@ -7,7 +7,7 @@
 //
 
 #import "SLEntityViewController.h"
-#import "CTRESTfulCoreData.h"
+#import "SLRESTfulCoreData.h"
 #import "SLEntityTextFieldCell.h"
 #import "SLEntitySwitchCell.h"
 #import "SLSelectEntityAttributeViewControllerProtocol.h"
