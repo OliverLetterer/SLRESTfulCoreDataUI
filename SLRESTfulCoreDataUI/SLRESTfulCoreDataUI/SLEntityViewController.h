@@ -32,6 +32,7 @@ typedef NS_ENUM(NSUInteger, SLEntityViewControllerEditingType) {
  value: string which will be displayed to the user for this property
  */
 @property (nonatomic, strong) NSDictionary *propertyMapping;
+@property (nonatomic, strong) NSArray *properties;
 
 /**
  managing keyboard types for attributes

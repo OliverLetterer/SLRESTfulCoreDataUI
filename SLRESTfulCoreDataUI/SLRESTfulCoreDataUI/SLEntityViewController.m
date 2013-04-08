@@ -25,8 +25,6 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 @property (nonatomic, readonly) UIBarButtonItem *activityIndicatorBarButtonItem;
 
-@property (nonatomic, strong) NSArray *properties;
-
 @property (nonatomic, strong) NSMutableDictionary *keyboardTypes;
 @property (nonatomic, strong) NSMutableDictionary *viewControllerClasses;
 @property (nonatomic, strong) NSMutableDictionary *fetchedResultsControllers;
