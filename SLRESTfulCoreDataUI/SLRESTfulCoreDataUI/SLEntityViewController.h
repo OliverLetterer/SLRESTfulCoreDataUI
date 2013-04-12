@@ -50,6 +50,19 @@ typedef NS_ENUM(NSUInteger, SLEntityViewControllerEditingType) {
 - (Class)viewControllerClassForAttribute:(NSString *)attribute;
 
 /**
+ If the user should only select an attribute from a distinct set of values. User will select `options` with corresponding index value if `enumValues`.
+ */
+- (void)setEnumValues:(NSArray *)enumValues withOptions:(NSArray *)options forAttribute:(NSString *)attribute;
+- (NSArray *)enumValuesForAttribute:(NSString *)attribute;
+- (NSArray *)enumOptionsForAttribute:(NSString *)attribute;
+
+/**
+ These predicated determine, if a given attribute should be displayed.
+ */
+- (void)onlyShowAttribute:(NSString *)attribute whenPredicateEvaluates:(NSPredicate *)predicate;
+- (NSPredicate *)predicateForAttribute:(NSString *)attribute;
+
+/**
  Configuring selection of relationships. fetchedResultsController will be used to display possible entities for the given relationship. nameKeyPath will be used as the name for each relationship entity.
  */
 - (void)setFetchedResultsController:(NSFetchedResultsController *)fetchedResultsController forRelationship:(NSString *)relationship;

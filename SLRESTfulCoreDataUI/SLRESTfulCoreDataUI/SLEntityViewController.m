@@ -12,6 +12,7 @@
 #import "SLEntitySwitchCell.h"
 #import "SLSelectEntityAttributeViewControllerProtocol.h"
 #import "SLSelectRelationshipEntityViewController.h"
+#import "SLSelectEnumAttributeViewController.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
 
@@ -19,9 +20,11 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 
 
-@interface SLEntityViewController () {
+@interface SLEntityViewController () <SLSelectEnumAttributeViewControllerDelegate> {
     NSManagedObject *_entity;
 }
+
+@property (nonatomic, strong) NSArray *showingProperties;
 
 @property (nonatomic, readonly) UIBarButtonItem *activityIndicatorBarButtonItem;
 
@@ -29,6 +32,12 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 @property (nonatomic, strong) NSMutableDictionary *viewControllerClasses;
 @property (nonatomic, strong) NSMutableDictionary *fetchedResultsControllers;
 @property (nonatomic, strong) NSMutableDictionary *relationshipNameKeyPaths;
+
+@property (nonatomic, strong) NSMutableDictionary *enumValues;
+@property (nonatomic, strong) NSMutableDictionary *enumOptions;
+@property (nonatomic, strong) NSMutableDictionary *enumOptionsValueMappings;
+
+@property (nonatomic, strong) NSMutableDictionary *predicates;
 
 @property (nonatomic, strong) NSEntityDescription *entityDescription;
 @property (nonatomic, strong) NSDictionary *propertyDescriptions;
@@ -85,6 +94,42 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     return _keyboardTypes;
 }
 
+- (NSMutableDictionary *)enumValues
+{
+    if (!_enumValues) {
+        _enumValues = [NSMutableDictionary dictionary];
+    }
+    
+    return _enumValues;
+}
+
+- (NSMutableDictionary *)enumOptions
+{
+    if (!_enumOptions) {
+        _enumOptions = [NSMutableDictionary dictionary];
+    }
+    
+    return _enumOptions;
+}
+
+- (NSMutableDictionary *)enumOptionsValueMappings
+{
+    if (!_enumOptionsValueMappings) {
+        _enumOptionsValueMappings = [NSMutableDictionary dictionary];
+    }
+    
+    return _enumOptionsValueMappings;
+}
+
+- (NSMutableDictionary *)predicates
+{
+    if (!_predicates) {
+        _predicates = [NSMutableDictionary dictionary];
+    }
+    
+    return _predicates;
+}
+
 - (void)setProperties:(NSArray *)properties
 {
     if (properties != _properties) {
@@ -100,6 +145,15 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         }
         
         self.propertyDescriptions = propertyDescriptions;
+        
+        [self _updateShowingProperties];
+    }
+}
+
+- (void)setShowingProperties:(NSArray *)showingProperties
+{
+    if (![showingProperties isEqualToArray:_showingProperties]) {
+        _showingProperties = showingProperties;
         
         [self.tableView reloadData];
     }
@@ -235,12 +289,12 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     // Return the number of rows in the section.
-    return self.properties.count;
+    return self.showingProperties.count;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    id propertyDescription = self.propertyDescriptions[self.properties[indexPath.row]];
+    id propertyDescription = self.propertyDescriptions[self.showingProperties[indexPath.row]];
     if ([propertyDescription isKindOfClass:[NSAttributeDescription class]]) {
         return [self tableView:tableView cellForAttributeDescription:propertyDescription atIndexPath:indexPath];
     } else if ([propertyDescription isKindOfClass:[NSRelationshipDescription class]]) {
@@ -287,9 +341,29 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    id propertyDescription = self.propertyDescriptions[self.properties[indexPath.row]];
+    id propertyDescription = self.propertyDescriptions[self.showingProperties[indexPath.row]];
     if ([propertyDescription isKindOfClass:[NSAttributeDescription class]]) {
         NSAttributeDescription *attributeDescription = propertyDescription;
+        
+        NSArray *enumOptions = [self enumOptionsForAttribute:attributeDescription.name];
+        NSArray *enumValues = [self enumValuesForAttribute:attributeDescription.name];
+        
+        if (enumOptions && enumValues) {
+            SLSelectEnumAttributeViewController *viewController = [[SLSelectEnumAttributeViewController alloc] initWithOptions:enumOptions values:enumValues currentValue:[self.entity valueForKey:attributeDescription.name]];
+            viewController.delegate = self;
+            viewController.title = self.propertyMapping[attributeDescription.name];
+            viewController.modalInPopover = self.modalInPopover;
+            viewController.contentSizeForViewInPopover = self.contentSizeForViewInPopover;
+            
+            viewController.view.backgroundColor = self.view.backgroundColor;
+            
+            objc_setAssociatedObject(viewController, &SLEntityViewControllerAttributeDescriptionKey,
+                                     attributeDescription, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            
+            [self.navigationController pushViewController:viewController animated:YES];
+            return;
+        }
+        
         Class viewControllerClass = [self viewControllerClassForAttribute:attributeDescription.name];
         
         if (viewControllerClass) {
@@ -328,6 +402,10 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         return objc_msgSend(self, selector, tableView, indexPath);
     }
     
+    NSArray *enumOptions = [self enumOptionsForAttribute:attributeDescription.name];
+    NSArray *enumValues = [self enumValuesForAttribute:attributeDescription.name];
+    BOOL useEnum = enumOptions && enumValues;
+    
     static NSArray *textFieldAttributes = nil;
     if (!textFieldAttributes) {
         textFieldAttributes = @[
@@ -342,7 +420,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
                                 ];
     }
     
-    BOOL useTextFieldCell = [textFieldAttributes containsObject:@(attributeDescription.attributeType)];
+    BOOL useTextFieldCell = [textFieldAttributes containsObject:@(attributeDescription.attributeType)] && !useEnum;
     
     if (useTextFieldCell) {
         static NSString *CellIdentifier = @"SLEntityTextFieldCell";
@@ -373,6 +451,20 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         } else {
             cell.textField.inputAccessoryView = nil;
         }
+        
+        return cell;
+    } else if (useEnum) {
+        static NSString *CellIdentifier = @"UITableViewCellUITableViewCellStyleValue1";
+        
+        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+        if (cell == nil) {
+            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
+        }
+        
+        cell.textLabel.text = self.propertyMapping[attributeDescription.name];
+        
+        cell.detailTextLabel.text = [self stringValueForAttribute:attributeDescription.name];
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         
         return cell;
     }
@@ -501,11 +593,21 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         default:
             break;
     }
+    
+    [self _updateShowingProperties];
 }
 
 - (NSString *)stringValueForAttribute:(NSString *)attribute
 {
     NSAttributeDescription *attributeDescription = self.propertyDescriptions[attribute];
+    
+    NSArray *enumOptions = [self enumOptionsForAttribute:attribute];
+    NSArray *enumValues = [self enumValuesForAttribute:attribute];
+    
+    if (enumOptions && enumValues) {
+        NSDictionary *mapping = self.enumOptionsValueMappings[attributeDescription.name];
+        return mapping[[self.entity valueForKey:attributeDescription.name]];
+    }
     
     switch (attributeDescription.attributeType) {
         case NSStringAttributeType:
@@ -549,6 +651,37 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     }
     
     return NSClassFromString(className);
+}
+
+- (void)setEnumValues:(NSArray *)enumValues withOptions:(NSArray *)options forAttribute:(NSString *)attribute
+{
+    NSAssert(enumValues.count == options.count, @"enumValues and options must have ");
+    
+    self.enumValues[attribute] = enumValues;
+    self.enumOptions[attribute] = options;
+    
+    self.enumOptionsValueMappings[attribute] = [NSDictionary dictionaryWithObjects:options forKeys:enumValues];
+}
+
+- (NSArray *)enumValuesForAttribute:(NSString *)attribute
+{
+    return self.enumValues[attribute];
+}
+
+- (NSArray *)enumOptionsForAttribute:(NSString *)attribute
+{
+    return self.enumOptions[attribute];
+}
+
+- (void)onlyShowAttribute:(NSString *)attribute whenPredicateEvaluates:(NSPredicate *)predicate
+{
+    self.predicates[attribute] = predicate;
+    [self _updateShowingProperties];
+}
+
+- (NSPredicate *)predicateForAttribute:(NSString *)attribute
+{
+    return self.predicates[attribute] ?: [NSPredicate predicateWithValue:YES];
 }
 
 - (void)setFetchedResultsController:(NSFetchedResultsController *)fetchedResultsController forRelationship:(NSString *)relationship
@@ -610,6 +743,19 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     }
     
     return nil;
+}
+
+#pragma mark - SLSelectEnumAttributeViewControllerDelegate
+
+- (void)selectEnumAttributeViewController:(SLSelectEnumAttributeViewController *)viewController didSelectEnumValue:(id)enumValue
+{
+    NSAttributeDescription *attributeDescription = objc_getAssociatedObject(viewController, &SLEntityViewControllerAttributeDescriptionKey);
+    
+    [self.entity setValue:enumValue forKey:attributeDescription.name];
+    [self _updateShowingProperties];
+    
+    [self.tableView reloadData];
+    [self.navigationController popViewControllerAnimated:YES];
 }
 
 #pragma mark - Private category implementation ()
@@ -693,6 +839,19 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     } else {
         [self.entity saveWithCompletionHandler:completionHandler];
     }
+}
+
+- (void)_updateShowingProperties
+{
+    NSMutableArray *array = [NSMutableArray arrayWithCapacity:self.properties.count];
+    
+    for (NSString *property in self.properties) {
+        if ([[self predicateForAttribute:property] evaluateWithObject:self.entity]) {
+            [array addObject:property];
+        }
+    }
+    
+    self.showingProperties = array;
 }
 
 @end
