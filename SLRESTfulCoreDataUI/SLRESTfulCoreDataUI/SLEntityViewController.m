@@ -26,8 +26,6 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 @property (nonatomic, strong) NSArray *showingProperties;
 
-@property (nonatomic, readonly) UIBarButtonItem *activityIndicatorBarButtonItem;
-
 @property (nonatomic, strong) NSMutableDictionary *keyboardTypes;
 @property (nonatomic, strong) NSMutableDictionary *viewControllerClasses;
 @property (nonatomic, strong) NSMutableDictionary *fetchedResultsControllers;
@@ -221,8 +219,8 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 {
     [super viewDidLoad];
     
-    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(_cancelButtonClicked:)];
-    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(_saveButtonClicked:)];
+    self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonClicked:)];
+    self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonClicked:)];
     
     if ([self.tableView respondsToSelector:@selector(setRestorationIdentifier:)]) {
         self.tableView.restorationIdentifier = NSStringFromClass(self.tableView.class);
@@ -246,6 +244,24 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 {
     [super viewDidAppear:animated];
     
+    for (NSString *property in self.properties) {
+        NSAttributeDescription *attributeDescription = self.propertyDescriptions[property];
+        
+        if (![attributeDescription isKindOfClass:[NSAttributeDescription class]]) {
+            continue;
+        }
+        
+        if (![self _attributeDescriptionRequiresTextField:attributeDescription] || [self stringValueForAttribute:property].length > 0) {
+            continue;
+        }
+        
+        NSInteger index = [self.properties indexOfObject:property];
+        SLEntityTextFieldCell *cell = (SLEntityTextFieldCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
+        if ([cell isKindOfClass:[SLEntityTextFieldCell class]]) {
+            [cell.textField becomeFirstResponder];
+            return;
+        }
+    }
 }
 
 - (void)viewWillDisappear:(BOOL)animated
@@ -402,25 +418,9 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         return objc_msgSend(self, selector, tableView, indexPath);
     }
     
-    NSArray *enumOptions = [self enumOptionsForAttribute:attributeDescription.name];
-    NSArray *enumValues = [self enumValuesForAttribute:attributeDescription.name];
-    BOOL useEnum = enumOptions && enumValues;
+    BOOL useEnum = [self _attributeDescriptionRequiresEnum:attributeDescription];
     
-    static NSArray *textFieldAttributes = nil;
-    if (!textFieldAttributes) {
-        textFieldAttributes = @[
-                                @(NSStringAttributeType),
-                                @(NSInteger16AttributeType),
-                                @(NSInteger32AttributeType),
-                                @(NSInteger64AttributeType),
-                                @(NSDecimalAttributeType),
-                                @(NSDoubleAttributeType),
-                                @(NSFloatAttributeType),
-                                @(NSDateAttributeType)
-                                ];
-    }
-    
-    BOOL useTextFieldCell = [textFieldAttributes containsObject:@(attributeDescription.attributeType)] && !useEnum;
+    BOOL useTextFieldCell = [self _attributeDescriptionRequiresTextField:attributeDescription];
     
     if (useTextFieldCell) {
         static NSString *CellIdentifier = @"SLEntityTextFieldCell";
@@ -704,6 +704,73 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     return self.relationshipNameKeyPaths[relationship];
 }
 
+- (void)cancelButtonClicked:(UIBarButtonItem *)sender
+{
+    if (self.editingType == SLEntityViewControllerEditingTypeCreate) {
+        NSManagedObject *entity = self.entity;
+        
+        [entity.managedObjectContext deleteObject:entity];
+        
+        NSError *saveError = nil;
+        [entity.managedObjectContext save:&saveError];
+        NSAssert(saveError == nil, @"error saving NSManagedObjectContext: %@", saveError);
+    } else {
+        NSManagedObject *entity = self.entity;
+        
+        NSArray *changedKeys = entity.changedValues.allKeys;
+        NSDictionary *commitedValues = [entity committedValuesForKeys:changedKeys];
+        
+        for (NSString *key in commitedValues) {
+            id value = commitedValues[key];
+            [entity setValue:[value isEqual:[NSNull null]] ? nil : value forKey:key];
+        }
+    }
+    
+    if (self.completionHandler) {
+        self.completionHandler(NO);
+        self.completionHandler = NULL;
+    }
+}
+
+- (void)saveButtonClicked:(UIBarButtonItem *)sender
+{
+    UIBarButtonItem *previousBarButtonItem = self.navigationItem.rightBarButtonItem;
+    self.navigationItem.rightBarButtonItem = self.activityIndicatorBarButtonItem;
+    self.navigationItem.leftBarButtonItem.enabled = NO;
+    self.view.userInteractionEnabled = NO;
+    
+    void(^cleanupUI)(void) = ^{
+        self.navigationItem.rightBarButtonItem = previousBarButtonItem;
+        self.navigationItem.leftBarButtonItem.enabled = YES;
+        self.view.userInteractionEnabled = YES;
+    };
+    
+    void(^completionHandler)(id managedObject, NSError *error) = ^(id managedObject, NSError *error) {
+        cleanupUI();
+        
+        if (error) {
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:error.localizedDescription
+                                                            message:error.localizedFailureReason
+                                                           delegate:nil
+                                                  cancelButtonTitle:NSLocalizedString(@"OK", @"")
+                                                  otherButtonTitles:nil];
+            [alert show];
+            return;
+        }
+        
+        if (self.completionHandler) {
+            self.completionHandler(YES);
+            self.completionHandler = NULL;
+        }
+    };
+    
+    if (self.editingType == SLEntityViewControllerEditingTypeCreate) {
+        [self.entity createWithCompletionHandler:completionHandler];
+    } else {
+        [self.entity saveWithCompletionHandler:completionHandler];
+    }
+}
+
 #pragma mark - UIViewControllerRestoration
 
 + (UIViewController *)viewControllerWithRestorationIdentifierPath:(NSArray *)identifierComponents coder:(NSCoder *)coder
@@ -774,73 +841,6 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     [self.entity setValue:@(sender.isOn) forKey:attributeDescription.name];
 }
 
-- (void)_cancelButtonClicked:(UIBarButtonItem *)sender
-{
-    if (self.editingType == SLEntityViewControllerEditingTypeCreate) {
-        NSManagedObject *entity = self.entity;
-        
-        [entity.managedObjectContext deleteObject:entity];
-        
-        NSError *saveError = nil;
-        [entity.managedObjectContext save:&saveError];
-        NSAssert(saveError == nil, @"error saving NSManagedObjectContext: %@", saveError);
-    } else {
-        NSManagedObject *entity = self.entity;
-        
-        NSArray *changedKeys = entity.changedValues.allKeys;
-        NSDictionary *commitedValues = [entity committedValuesForKeys:changedKeys];
-        
-        for (NSString *key in commitedValues) {
-            id value = commitedValues[key];
-            [entity setValue:[value isEqual:[NSNull null]] ? nil : value forKey:key];
-        }
-    }
-    
-    if (self.completionHandler) {
-        self.completionHandler(NO);
-        self.completionHandler = NULL;
-    }
-}
-
-- (void)_saveButtonClicked:(UIBarButtonItem *)sender
-{
-    UIBarButtonItem *previousBarButtonItem = self.navigationItem.rightBarButtonItem;
-    self.navigationItem.rightBarButtonItem = self.activityIndicatorBarButtonItem;
-    self.navigationItem.leftBarButtonItem.enabled = NO;
-    self.view.userInteractionEnabled = NO;
-    
-    void(^cleanupUI)(void) = ^{
-        self.navigationItem.rightBarButtonItem = previousBarButtonItem;
-        self.navigationItem.leftBarButtonItem.enabled = YES;
-        self.view.userInteractionEnabled = YES;
-    };
-    
-    void(^completionHandler)(id managedObject, NSError *error) = ^(id managedObject, NSError *error) {
-        cleanupUI();
-        
-        if (error) {
-            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:error.localizedDescription
-                                                            message:error.localizedFailureReason
-                                                           delegate:nil
-                                                  cancelButtonTitle:NSLocalizedString(@"OK", @"")
-                                                  otherButtonTitles:nil];
-            [alert show];
-            return;
-        }
-        
-        if (self.completionHandler) {
-            self.completionHandler(YES);
-            self.completionHandler = NULL;
-        }
-    };
-    
-    if (self.editingType == SLEntityViewControllerEditingTypeCreate) {
-        [self.entity createWithCompletionHandler:completionHandler];
-    } else {
-        [self.entity saveWithCompletionHandler:completionHandler];
-    }
-}
-
 - (void)_updateShowingProperties
 {
     NSMutableArray *array = [NSMutableArray arrayWithCapacity:self.properties.count];
@@ -852,6 +852,33 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     }
     
     self.showingProperties = array;
+}
+
+- (BOOL)_attributeDescriptionRequiresEnum:(NSAttributeDescription *)attributeDescription
+{
+    NSArray *enumOptions = [self enumOptionsForAttribute:attributeDescription.name];
+    NSArray *enumValues = [self enumValuesForAttribute:attributeDescription.name];
+    
+    return enumOptions != nil && enumValues != nil;
+}
+
+- (BOOL)_attributeDescriptionRequiresTextField:(NSAttributeDescription *)attributeDescription
+{
+    static NSArray *textFieldAttributes = nil;
+    if (!textFieldAttributes) {
+        textFieldAttributes = @[
+                                @(NSStringAttributeType),
+                                @(NSInteger16AttributeType),
+                                @(NSInteger32AttributeType),
+                                @(NSInteger64AttributeType),
+                                @(NSDecimalAttributeType),
+                                @(NSDoubleAttributeType),
+                                @(NSFloatAttributeType),
+                                @(NSDateAttributeType)
+                                ];
+    }
+    
+    return [textFieldAttributes containsObject:@(attributeDescription.attributeType)] && ![self _attributeDescriptionRequiresEnum:attributeDescription];
 }
 
 @end
