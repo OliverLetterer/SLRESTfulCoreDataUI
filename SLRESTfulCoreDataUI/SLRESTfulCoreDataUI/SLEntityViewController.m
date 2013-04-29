@@ -534,10 +534,6 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         return registeredKeyboardType.integerValue;
     }
     
-    if ([attribute isEqualToString:@"price"]) {
-        DLog(@"");
-    }
-    
     NSAttributeDescription *attributeDescription = self.propertyDescriptions[attribute];
 
     switch (attributeDescription.attributeType) {
