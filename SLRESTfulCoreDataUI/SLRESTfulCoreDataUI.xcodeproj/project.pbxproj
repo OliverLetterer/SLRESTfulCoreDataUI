@@ -8,14 +8,17 @@
 
 /* Begin PBXBuildFile section */
 		A70322BE16F79DFA0036A0F3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A70322BD16F79DFA0036A0F3 /* Foundation.framework */; };
-		A70322C316F79DFA0036A0F3 /* SLRESTfulCoreDataUI.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = A70322C216F79DFA0036A0F3 /* SLRESTfulCoreDataUI.h */; };
-		A70322C516F79DFA0036A0F3 /* SLRESTfulCoreDataUI.m in Sources */ = {isa = PBXBuildFile; fileRef = A70322C416F79DFA0036A0F3 /* SLRESTfulCoreDataUI.m */; };
 		A70322CD16F79DFB0036A0F3 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A70322CC16F79DFB0036A0F3 /* SenTestingKit.framework */; };
 		A70322CF16F79DFB0036A0F3 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A70322CE16F79DFB0036A0F3 /* UIKit.framework */; };
 		A70322D016F79DFB0036A0F3 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A70322BD16F79DFA0036A0F3 /* Foundation.framework */; };
 		A70322D316F79DFB0036A0F3 /* libSLRESTfulCoreDataUI.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A70322BA16F79DFA0036A0F3 /* libSLRESTfulCoreDataUI.a */; };
 		A70322D916F79DFB0036A0F3 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A70322D716F79DFB0036A0F3 /* InfoPlist.strings */; };
 		A70322DC16F79DFB0036A0F3 /* SLRESTfulCoreDataUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = A70322DB16F79DFB0036A0F3 /* SLRESTfulCoreDataUITests.m */; };
+		A77151F417302F5900D97D6E /* SLEntitySwitchCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A77151E917302F5900D97D6E /* SLEntitySwitchCell.m */; };
+		A77151F517302F5900D97D6E /* SLEntityTextFieldCell.m in Sources */ = {isa = PBXBuildFile; fileRef = A77151EB17302F5900D97D6E /* SLEntityTextFieldCell.m */; };
+		A77151F617302F5900D97D6E /* SLEntityViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A77151ED17302F5900D97D6E /* SLEntityViewController.m */; };
+		A77151F717302F5900D97D6E /* SLSelectEnumAttributeViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A77151F117302F5900D97D6E /* SLSelectEnumAttributeViewController.m */; };
+		A77151F817302F5900D97D6E /* SLSelectRelationshipEntityViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = A77151F317302F5900D97D6E /* SLSelectRelationshipEntityViewController.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,7 +38,6 @@
 			dstPath = "include/${PRODUCT_NAME}";
 			dstSubfolderSpec = 16;
 			files = (
-				A70322C316F79DFA0036A0F3 /* SLRESTfulCoreDataUI.h in CopyFiles */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -45,8 +47,6 @@
 		A70322BA16F79DFA0036A0F3 /* libSLRESTfulCoreDataUI.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libSLRESTfulCoreDataUI.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		A70322BD16F79DFA0036A0F3 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		A70322C116F79DFA0036A0F3 /* SLRESTfulCoreDataUI-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SLRESTfulCoreDataUI-Prefix.pch"; sourceTree = "<group>"; };
-		A70322C216F79DFA0036A0F3 /* SLRESTfulCoreDataUI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SLRESTfulCoreDataUI.h; sourceTree = "<group>"; };
-		A70322C416F79DFA0036A0F3 /* SLRESTfulCoreDataUI.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SLRESTfulCoreDataUI.m; sourceTree = "<group>"; };
 		A70322CB16F79DFB0036A0F3 /* SLRESTfulCoreDataUITests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SLRESTfulCoreDataUITests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A70322CC16F79DFB0036A0F3 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 		A70322CE16F79DFB0036A0F3 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = Library/Frameworks/UIKit.framework; sourceTree = DEVELOPER_DIR; };
@@ -54,6 +54,18 @@
 		A70322D816F79DFB0036A0F3 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A70322DA16F79DFB0036A0F3 /* SLRESTfulCoreDataUITests.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SLRESTfulCoreDataUITests.h; sourceTree = "<group>"; };
 		A70322DB16F79DFB0036A0F3 /* SLRESTfulCoreDataUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SLRESTfulCoreDataUITests.m; sourceTree = "<group>"; };
+		A77151E817302F5900D97D6E /* SLEntitySwitchCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SLEntitySwitchCell.h; sourceTree = "<group>"; };
+		A77151E917302F5900D97D6E /* SLEntitySwitchCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SLEntitySwitchCell.m; sourceTree = "<group>"; };
+		A77151EA17302F5900D97D6E /* SLEntityTextFieldCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SLEntityTextFieldCell.h; sourceTree = "<group>"; };
+		A77151EB17302F5900D97D6E /* SLEntityTextFieldCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SLEntityTextFieldCell.m; sourceTree = "<group>"; };
+		A77151EC17302F5900D97D6E /* SLEntityViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SLEntityViewController.h; sourceTree = "<group>"; };
+		A77151ED17302F5900D97D6E /* SLEntityViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SLEntityViewController.m; sourceTree = "<group>"; };
+		A77151EE17302F5900D97D6E /* SLRESTfulCoreDataUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SLRESTfulCoreDataUI.h; sourceTree = "<group>"; };
+		A77151EF17302F5900D97D6E /* SLSelectEntityAttributeViewControllerProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SLSelectEntityAttributeViewControllerProtocol.h; sourceTree = "<group>"; };
+		A77151F017302F5900D97D6E /* SLSelectEnumAttributeViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SLSelectEnumAttributeViewController.h; sourceTree = "<group>"; };
+		A77151F117302F5900D97D6E /* SLSelectEnumAttributeViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SLSelectEnumAttributeViewController.m; sourceTree = "<group>"; };
+		A77151F217302F5900D97D6E /* SLSelectRelationshipEntityViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SLSelectRelationshipEntityViewController.h; sourceTree = "<group>"; };
+		A77151F317302F5900D97D6E /* SLSelectRelationshipEntityViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SLSelectRelationshipEntityViewController.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -111,8 +123,18 @@
 		A70322BF16F79DFA0036A0F3 /* SLRESTfulCoreDataUI */ = {
 			isa = PBXGroup;
 			children = (
-				A70322C216F79DFA0036A0F3 /* SLRESTfulCoreDataUI.h */,
-				A70322C416F79DFA0036A0F3 /* SLRESTfulCoreDataUI.m */,
+				A77151E817302F5900D97D6E /* SLEntitySwitchCell.h */,
+				A77151E917302F5900D97D6E /* SLEntitySwitchCell.m */,
+				A77151EA17302F5900D97D6E /* SLEntityTextFieldCell.h */,
+				A77151EB17302F5900D97D6E /* SLEntityTextFieldCell.m */,
+				A77151EC17302F5900D97D6E /* SLEntityViewController.h */,
+				A77151ED17302F5900D97D6E /* SLEntityViewController.m */,
+				A77151EE17302F5900D97D6E /* SLRESTfulCoreDataUI.h */,
+				A77151EF17302F5900D97D6E /* SLSelectEntityAttributeViewControllerProtocol.h */,
+				A77151F017302F5900D97D6E /* SLSelectEnumAttributeViewController.h */,
+				A77151F117302F5900D97D6E /* SLSelectEnumAttributeViewController.m */,
+				A77151F217302F5900D97D6E /* SLSelectRelationshipEntityViewController.h */,
+				A77151F317302F5900D97D6E /* SLSelectRelationshipEntityViewController.m */,
 				A70322C016F79DFA0036A0F3 /* Supporting Files */,
 			);
 			path = SLRESTfulCoreDataUI;
@@ -243,7 +265,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A70322C516F79DFA0036A0F3 /* SLRESTfulCoreDataUI.m in Sources */,
+				A77151F417302F5900D97D6E /* SLEntitySwitchCell.m in Sources */,
+				A77151F517302F5900D97D6E /* SLEntityTextFieldCell.m in Sources */,
+				A77151F617302F5900D97D6E /* SLEntityViewController.m in Sources */,
+				A77151F717302F5900D97D6E /* SLSelectEnumAttributeViewController.m in Sources */,
+				A77151F817302F5900D97D6E /* SLSelectRelationshipEntityViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -403,6 +429,7 @@
 				A70322E116F79DFB0036A0F3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		A70322E216F79DFB0036A0F3 /* Build configuration list for PBXNativeTarget "SLRESTfulCoreDataUITests" */ = {
 			isa = XCConfigurationList;
@@ -411,6 +438,7 @@
 				A70322E416F79DFB0036A0F3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
