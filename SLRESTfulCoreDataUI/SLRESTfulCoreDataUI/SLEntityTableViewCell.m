@@ -1,5 +1,5 @@
 //
-//  SLEntitySwitchCell.h
+//  SLEntityTableViewCell.m
 //
 //  The MIT License (MIT)
 //  Copyright (c) 2013 Oliver Letterer, Sparrow-Labs
@@ -23,16 +23,63 @@
 //  THE SOFTWARE.
 //
 
-#import <UIKit/UIKit.h>
 #import "SLEntityTableViewCell.h"
 
 
 
-/**
- @abstract  <#abstract comment#>
- */
-@interface SLEntitySwitchCell : SLEntityTableViewCell
+@interface SLEntityTableViewCell () {
+    
+}
 
-@property (nonatomic, readonly) UISwitch *switchControl;
+@end
+
+
+
+@implementation SLEntityTableViewCell
+
+#pragma mark - Initialization
+
+- (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier 
+{
+    if (self = [super initWithStyle:style reuseIdentifier:reuseIdentifier]) {
+        // Initialization code
+    }
+    return self;
+}
+
+#pragma mark - UITableViewCell
+
+//- (void)setSelected:(BOOL)selected animated:(BOOL)animated 
+//{
+//    [super setSelected:selected animated:animated];
+//
+//}
+
+//- (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated 
+//{
+//    [super setHighlighted:highlighted animated:animated];
+//    
+//}
+
+//- (void)layoutSubviews 
+//{
+//    [super layoutSubviews];
+//    
+//}
+
+//- (void)prepareForReuse 
+//{
+//    [super prepareForReuse];
+//    
+//}
+
+#pragma mark - Memory management
+
+- (void)dealloc
+{
+    
+}
+
+#pragma mark - Private category implementation ()
 
 @end

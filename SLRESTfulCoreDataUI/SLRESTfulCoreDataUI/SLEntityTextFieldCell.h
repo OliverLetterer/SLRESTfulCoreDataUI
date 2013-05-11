@@ -24,13 +24,14 @@
 //
 
 #import <UIKit/UIKit.h>
+#import "SLEntityTableViewCell.h"
 
 
 
 /**
  @abstract  <#abstract comment#>
  */
-@interface SLEntityTextFieldCell : UITableViewCell
+@interface SLEntityTextFieldCell : SLEntityTableViewCell
 
 @property (nonatomic, readonly) UITextField *textField;
 

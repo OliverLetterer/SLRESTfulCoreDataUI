@@ -1,5 +1,5 @@
 //
-//  SLEntitySwitchCell.h
+//  SLEntityTableViewCell.h
 //
 //  The MIT License (MIT)
 //  Copyright (c) 2013 Oliver Letterer, Sparrow-Labs
@@ -23,16 +23,11 @@
 //  THE SOFTWARE.
 //
 
-#import <UIKit/UIKit.h>
-#import "SLEntityTableViewCell.h"
-
 
 
 /**
  @abstract  <#abstract comment#>
  */
-@interface SLEntitySwitchCell : SLEntityTableViewCell
-
-@property (nonatomic, readonly) UISwitch *switchControl;
+@interface SLEntityTableViewCell : UITableViewCell
 
 @end

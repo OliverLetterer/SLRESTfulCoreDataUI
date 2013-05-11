@@ -30,6 +30,7 @@
 #import "SLSelectEntityAttributeViewControllerProtocol.h"
 #import "SLSelectRelationshipEntityViewController.h"
 #import "SLSelectEnumAttributeViewController.h"
+#import "SLEntityTableViewCell.h"
 #import <objc/runtime.h>
 #import <objc/message.h>
 
@@ -417,6 +418,8 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         viewController.modalInPopover = self.modalInPopover;
         viewController.contentSizeForViewInPopover = self.contentSizeForViewInPopover;
         viewController.view.backgroundColor = self.view.backgroundColor;
+        viewController.tableView.separatorColor = self.tableView.separatorColor;
+        viewController.tableView.separatorStyle = self.tableView.separatorStyle;
         
         [self.navigationController pushViewController:viewController animated:YES];
         return;
@@ -475,11 +478,11 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         
         return cell;
     } else if (useEnum) {
-        static NSString *CellIdentifier = @"UITableViewCellUITableViewCellStyleValue1";
+        static NSString *CellIdentifier = @"SLEntityTableViewCellUITableViewCellStyleValue1";
         
-        UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+        SLEntityTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
         if (cell == nil) {
-            cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
+            cell = [[SLEntityTableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
         }
         
         cell.textLabel.text = self.propertyMapping[attributeDescription.name];
@@ -524,11 +527,11 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         return objc_msgSend(self, selector, tableView, indexPath);
     }
     
-    static NSString *CellIdentifier = @"Cell";
+    static NSString *CellIdentifier = @"SLEntityTableViewCell";
     
-    UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    SLEntityTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
-        cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
+        cell = [[SLEntityTableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
     }
     
     cell.textLabel.text = self.propertyMapping[relationshipDescription.name];

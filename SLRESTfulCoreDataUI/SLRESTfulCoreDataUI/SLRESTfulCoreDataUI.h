@@ -25,7 +25,9 @@
 
 #import "SLRESTfulCoreData.h"
 #import "SLEntityViewController.h"
-#import "SLEntityTextFieldCell.h"
-#import "SLEntitySwitchCell.h"
 #import "SLSelectEntityAttributeViewControllerProtocol.h"
 #import "SLSelectRelationshipEntityViewController.h"
+
+#import "SLEntityTableViewCell.h"
+#import "SLEntityTextFieldCell.h"
+#import "SLEntitySwitchCell.h"
