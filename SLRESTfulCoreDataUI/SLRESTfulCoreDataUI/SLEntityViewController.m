@@ -385,9 +385,9 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
             SLSelectEnumAttributeViewController *viewController = [[SLSelectEnumAttributeViewController alloc] initWithOptions:enumOptions values:enumValues currentValue:[self.entity valueForKey:attributeDescription.name]];
             viewController.delegate = self;
             viewController.title = self.propertyMapping[attributeDescription.name];
+            
             viewController.modalInPopover = self.modalInPopover;
             viewController.contentSizeForViewInPopover = self.contentSizeForViewInPopover;
-            
             viewController.view.backgroundColor = self.view.backgroundColor;
             
             objc_setAssociatedObject(viewController, &SLEntityViewControllerAttributeDescriptionKey,
@@ -414,6 +414,10 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
                                                                                                                                                entity:self.entity
                                                                                                                                        keyPathForName:nameKeyPath];
         viewController.title = self.propertyMapping[relationshipDescription.name];
+        viewController.modalInPopover = self.modalInPopover;
+        viewController.contentSizeForViewInPopover = self.contentSizeForViewInPopover;
+        viewController.view.backgroundColor = self.view.backgroundColor;
+        
         [self.navigationController pushViewController:viewController animated:YES];
         return;
     }
@@ -527,10 +531,15 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
     }
     
-    NSString *nameKeyPath = [self nameKeyPathForRelationship:relationshipDescription.name];
-    
     cell.textLabel.text = self.propertyMapping[relationshipDescription.name];
-    cell.detailTextLabel.text = [[self.entity valueForKey:relationshipDescription.name] valueForKey:nameKeyPath];
+    
+    if (relationshipDescription.isToMany) {
+        cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"%d selected", @""), [[self.entity valueForKey:relationshipDescription.name] count]];
+    } else {
+        NSString *nameKeyPath = [self nameKeyPathForRelationship:relationshipDescription.name];
+        cell.detailTextLabel.text = [[self.entity valueForKey:relationshipDescription.name] valueForKey:nameKeyPath];
+    }
+    
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     
     return cell;

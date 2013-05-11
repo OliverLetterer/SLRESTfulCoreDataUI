@@ -43,6 +43,8 @@
 
 - (id)initWithFetchedResultsController:(NSFetchedResultsController *)fetchedResultsController relationshipDescription:(NSRelationshipDescription *)relationshipDescription entity:(NSManagedObject *)entity keyPathForName:(NSString *)keyPathForName
 {
+    NSParameterAssert(fetchedResultsController);
+    
     if (self = [super initWithStyle:UITableViewStylePlain]) {
         _fetchedResultsController = fetchedResultsController;
         _relationshipDescription = relationshipDescription;
@@ -56,7 +58,7 @@
         NSAssert(error == nil, @"controller %@ error: %@", self.fetchedResultsController, error);
         
         NSAssert(self.fetchedResultsController.sectionNameKeyPath == nil, @"sectionNameKeyPath not supported right now");
-        NSAssert(self.relationshipDescription.isToMany == NO, @"to many relationship not supported right now");
+        NSAssert(!(self.relationshipDescription.inverseRelationship.isToMany && self.relationshipDescription.isToMany), @"many-to-many relationship not supported right now");
         
         if ([self respondsToSelector:@selector(setRestorationIdentifier:)]) {
             self.restorationIdentifier = NSStringFromClass(self.class);
@@ -165,10 +167,10 @@
     NSManagedObject *thisEntity = self.fetchedResultsController.fetchedObjects[indexPath.row];
     cell.textLabel.text = [thisEntity valueForKey:self.keyPathForName];
     
-    if (thisEntity == [self.entity valueForKey:self.relationshipDescription.name]) {
-        cell.accessoryType = UITableViewCellAccessoryCheckmark;
+    if (self.relationshipDescription.isToMany) {
+        cell.accessoryType = self.entity == [thisEntity valueForKey:self.relationshipDescription.inverseRelationship.name] ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
     } else {
-        cell.accessoryType = UITableViewCellAccessoryNone;
+        cell.accessoryType = thisEntity == [self.entity valueForKey:self.relationshipDescription.name] ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
     }
     
     return cell;
@@ -212,8 +214,21 @@
 {
     NSManagedObject *thisEntity = self.fetchedResultsController.fetchedObjects[indexPath.row];
     
-    [self.entity setValue:thisEntity forKey:self.relationshipDescription.name];
-    [self.navigationController popViewControllerAnimated:YES];
+    if (self.relationshipDescription.isToMany) {
+        NSSet *set = [self.entity valueForKey:self.relationshipDescription.name];
+        
+        if ([set containsObject:thisEntity]) {
+            [thisEntity setValue:nil forKey:self.relationshipDescription.inverseRelationship.name];
+        } else {
+            [thisEntity setValue:self.entity forKey:self.relationshipDescription.inverseRelationship.name];
+        }
+        
+        [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
+        [self.tableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationNone];
+    } else {
+        [self.entity setValue:thisEntity forKey:self.relationshipDescription.name];
+        [self.navigationController popViewControllerAnimated:YES];
+    }
 }
 
 #pragma mark - UIViewControllerRestoration
