@@ -171,7 +171,9 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     if (![showingProperties isEqualToArray:_showingProperties]) {
         _showingProperties = showingProperties;
         
-        [self.tableView reloadData];
+        if (self.isViewLoaded) {
+            [self.tableView reloadData];
+        }
     }
 }
 
@@ -564,7 +566,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     }
     
     NSAttributeDescription *attributeDescription = self.propertyDescriptions[attribute];
-
+    
     switch (attributeDescription.attributeType) {
         case NSStringAttributeType:
             return UIKeyboardTypeAlphabet;
