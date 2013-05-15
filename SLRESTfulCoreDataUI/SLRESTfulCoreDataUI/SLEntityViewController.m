@@ -162,17 +162,22 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         
         self.propertyDescriptions = propertyDescriptions;
         
-        [self _updateShowingProperties];
+        [self _updateVisibleProperties];
     }
 }
 
 - (void)setShowingProperties:(NSArray *)showingProperties
 {
     if (![showingProperties isEqualToArray:_showingProperties]) {
+        NSArray *previousProperties = _showingProperties.copy;
         _showingProperties = showingProperties;
         
         if (self.isViewLoaded) {
-            [self.tableView reloadData];
+            if (!self.tableView.window) {
+                [self.tableView reloadData];
+            } else {
+                [self _applyDiffUpdateToTableViewWithVisbleProperties:_showingProperties previousVisibleProperties:previousProperties];
+            }
         }
     }
 }
@@ -621,7 +626,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
             break;
     }
     
-    [self _updateShowingProperties];
+    [self _updateVisibleProperties];
 }
 
 - (NSString *)stringValueForAttribute:(NSString *)attribute
@@ -703,7 +708,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (void)onlyShowAttribute:(NSString *)attribute whenPredicateEvaluates:(NSPredicate *)predicate
 {
     self.predicates[attribute] = predicate;
-    [self _updateShowingProperties];
+    [self _updateVisibleProperties];
 }
 
 - (NSPredicate *)predicateForAttribute:(NSString *)attribute
@@ -846,7 +851,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     NSAttributeDescription *attributeDescription = objc_getAssociatedObject(viewController, &SLEntityViewControllerAttributeDescriptionKey);
     
     [self.entity setValue:enumValue forKey:attributeDescription.name];
-    [self _updateShowingProperties];
+    [self _updateVisibleProperties];
     
     [self.tableView reloadData];
     [self.navigationController popViewControllerAnimated:YES];
@@ -866,9 +871,10 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     NSAttributeDescription *attributeDescription = objc_getAssociatedObject(sender, &SLEntityViewControllerAttributeDescriptionKey);
     
     [self.entity setValue:@(sender.isOn) forKey:attributeDescription.name];
+    [self _updateVisibleProperties];
 }
 
-- (void)_updateShowingProperties
+- (void)_updateVisibleProperties
 {
     NSMutableArray *array = [NSMutableArray arrayWithCapacity:self.properties.count];
     
@@ -906,6 +912,35 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     }
     
     return [textFieldAttributes containsObject:@(attributeDescription.attributeType)] && ![self _attributeDescriptionRequiresEnum:attributeDescription];
+}
+
+- (void)_applyDiffUpdateToTableViewWithVisbleProperties:(NSArray *)visibleProperties previousVisibleProperties:(NSArray *)previousVisibleProperties
+{
+    NSMutableArray *deletedIndexPaths = [NSMutableArray arrayWithCapacity:previousVisibleProperties.count];
+    NSMutableArray *insertedIndexPaths = [NSMutableArray arrayWithCapacity:visibleProperties.count];
+    
+    for (NSString *property in previousVisibleProperties) {
+        if ([visibleProperties containsObject:property]) {
+            continue;
+        }
+        
+        [deletedIndexPaths addObject:[NSIndexPath indexPathForRow:[previousVisibleProperties indexOfObject:property] inSection:0]];
+    }
+    
+    for (NSString *property in visibleProperties) {
+        if ([previousVisibleProperties containsObject:property]) {
+            continue;
+        }
+        
+        [insertedIndexPaths addObject:[NSIndexPath indexPathForRow:[visibleProperties indexOfObject:property] inSection:0]];
+    }
+    
+    [self.tableView beginUpdates];
+    
+    [self.tableView deleteRowsAtIndexPaths:deletedIndexPaths withRowAnimation:UITableViewRowAnimationTop];
+    [self.tableView insertRowsAtIndexPaths:insertedIndexPaths withRowAnimation:UITableViewRowAnimationTop];
+    
+    [self.tableView endUpdates];
 }
 
 @end
