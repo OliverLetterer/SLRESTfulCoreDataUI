@@ -154,7 +154,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         NSMutableDictionary *propertyDescriptions = [NSMutableDictionary dictionaryWithCapacity:_properties.count];
         
         for (NSString *propertyName in _properties) {
-            NSPropertyDescription *propertyDescription = self.entityDescription.attributesByName[propertyName] ?: self.entityDescription.relationshipsByName[propertyName];
+            NSPropertyDescription *propertyDescription = self.entityDescription.propertiesByName[propertyName];
             NSAssert(propertyDescription != nil, @"propertyDescription for key %@ cannot be nil", propertyName);
             
             propertyDescriptions[propertyName] = propertyDescription;
@@ -707,6 +707,8 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (void)onlyShowAttribute:(NSString *)attribute whenPredicateEvaluates:(NSPredicate *)predicate
 {
+    NSAssert([self.properties containsObject:attribute], @"%@ not included in configured properties: %@", attribute, self.properties);
+    
     self.predicates[attribute] = predicate;
     [self _updateVisibleProperties];
 }
@@ -718,6 +720,8 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (void)setFetchedResultsController:(NSFetchedResultsController *)fetchedResultsController forRelationship:(NSString *)relationship
 {
+    NSAssert([self.properties containsObject:relationship], @"%@ not included in configured properties: %@", relationship, self.properties);
+    
     self.fetchedResultsControllers[relationship] = fetchedResultsController;
 }
 
@@ -728,6 +732,8 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (void)setNameKeyPath:(NSString *)nameKeyPath forRelationship:(NSString *)relationship
 {
+    NSAssert([self.properties containsObject:relationship], @"%@ not included in configured properties: %@", relationship, self.properties);
+    
     self.relationshipNameKeyPaths[relationship] = nameKeyPath;
 }
 
