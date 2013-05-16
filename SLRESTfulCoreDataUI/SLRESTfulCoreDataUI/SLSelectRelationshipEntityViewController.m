@@ -25,6 +25,16 @@
 
 #import "SLSelectRelationshipEntityViewController.h"
 #import "SLEntityTableViewCell.h"
+#import <objc/message.h>
+
+static NSString *capitalizedString(NSString *string)
+{
+    if (string.length == 0) {
+        return @"";
+    }
+    
+    return [[string substringToIndex:1] stringByAppendingString:[string substringFromIndex:1]];
+}
 
 
 
@@ -59,7 +69,6 @@
         NSAssert(error == nil, @"controller %@ error: %@", self.fetchedResultsController, error);
         
         NSAssert(self.fetchedResultsController.sectionNameKeyPath == nil, @"sectionNameKeyPath not supported right now");
-        NSAssert(!(self.relationshipDescription.inverseRelationship.isToMany && self.relationshipDescription.isToMany), @"many-to-many relationship not supported right now");
         
         if ([self respondsToSelector:@selector(setRestorationIdentifier:)]) {
             self.restorationIdentifier = NSStringFromClass(self.class);
@@ -82,7 +91,7 @@
 //- (void)loadView
 //{
 //    [super loadView];
-//    
+//
 //}
 
 - (void)viewDidLoad
@@ -169,7 +178,8 @@
     cell.textLabel.text = [thisEntity valueForKey:self.keyPathForName];
     
     if (self.relationshipDescription.isToMany) {
-        cell.accessoryType = self.entity == [thisEntity valueForKey:self.relationshipDescription.inverseRelationship.name] ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+        NSSet *set = [self.entity valueForKey:self.relationshipDescription.name];
+        cell.accessoryType = [set containsObject:thisEntity] ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
     } else {
         cell.accessoryType = thisEntity == [self.entity valueForKey:self.relationshipDescription.name] ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
     }
@@ -190,16 +200,16 @@
 //    if (editingStyle == UITableViewCellEditingStyleDelete) {
 //        // Delete the row from the data source
 //        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
-//    }   
+//    }
 //    else if (editingStyle == UITableViewCellEditingStyleInsert) {
 //        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-//    }   
+//    }
 //}
 
 // Override to support rearranging the table view.
 //- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
 //{
-//    
+//
 //}
 
 // Override to support conditional rearranging of the table view.
@@ -217,12 +227,15 @@
     
     if (self.relationshipDescription.isToMany) {
         NSSet *set = [self.entity valueForKey:self.relationshipDescription.name];
+        SEL addOrDeleteSelector = NULL;
         
         if ([set containsObject:thisEntity]) {
-            [thisEntity setValue:nil forKey:self.relationshipDescription.inverseRelationship.name];
+            addOrDeleteSelector = NSSelectorFromString([NSString stringWithFormat:@"remove%@Object:", capitalizedString(self.relationshipDescription.name)]);
         } else {
-            [thisEntity setValue:self.entity forKey:self.relationshipDescription.inverseRelationship.name];
+            addOrDeleteSelector = NSSelectorFromString([NSString stringWithFormat:@"add%@Object:", capitalizedString(self.relationshipDescription.name)]);
         }
+        
+        objc_msgSend(self.entity, addOrDeleteSelector, thisEntity);
         
         [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
         [self.tableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationNone];
