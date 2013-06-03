@@ -744,6 +744,8 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (void)cancelButtonClicked:(UIBarButtonItem *)sender
 {
+    [[UIApplication sharedApplication] sendAction:@selector(resignFirstResponder) to:nil from:nil forEvent:nil];
+    
     if (self.editingType == SLEntityViewControllerEditingTypeCreate) {
         NSManagedObject *entity = self.entity;
         
@@ -772,6 +774,8 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (void)saveButtonClicked:(UIBarButtonItem *)sender
 {
+    [[UIApplication sharedApplication] sendAction:@selector(resignFirstResponder) to:nil from:nil forEvent:nil];
+    
     UIBarButtonItem *previousBarButtonItem = self.navigationItem.rightBarButtonItem;
     self.navigationItem.rightBarButtonItem = self.activityIndicatorBarButtonItem;
     self.navigationItem.leftBarButtonItem.enabled = NO;
