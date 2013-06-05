@@ -483,6 +483,8 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
             cell.textField.inputAccessoryView = nil;
         }
         
+        [self configureTextFieldCell:cell forAttribute:attributeDescription.name];
+        
         return cell;
     } else if (useEnum) {
         static NSString *CellIdentifier = @"SLEntityTableViewCellUITableViewCellStyleValue1";
@@ -664,6 +666,11 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     }
     
     return [NSString stringWithFormat:@"%@", [self.entity valueForKey:attribute]];
+}
+
+- (void)configureTextFieldCell:(SLEntityTextFieldCell *)textFieldCell forAttribute:(NSString *)attribute
+{
+    
 }
 
 - (void)setViewControllerClass:(Class)viewControllerClass forAttribute:(NSString *)attribute

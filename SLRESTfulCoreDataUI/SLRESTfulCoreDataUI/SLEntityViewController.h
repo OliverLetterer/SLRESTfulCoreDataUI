@@ -27,6 +27,8 @@
 #import <CoreData/CoreData.h>
 #import <UIKit/UIKit.h>
 
+@class SLEntityTextFieldCell;
+
 typedef NS_ENUM(NSUInteger, SLEntityViewControllerEditingType) {
     SLEntityViewControllerEditingTypeCreate = 0,
     SLEntityViewControllerEditingTypeEdit
@@ -60,6 +62,8 @@ typedef NS_ENUM(NSUInteger, SLEntityViewControllerEditingType) {
 
 - (void)applyStringValue:(NSString *)value forAttribute:(NSString *)attribute;
 - (NSString *)stringValueForAttribute:(NSString *)attribute;
+
+- (void)configureTextFieldCell:(SLEntityTextFieldCell *)textFieldCell forAttribute:(NSString *)attribute;
 
 /**
  Registera custom view controller class which conforms to `SLSelectEntityAttributeViewControllerProtocol`. An instance of this class will be pushed if the corresponding cell has been selected.
