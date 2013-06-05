@@ -654,6 +654,10 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         case NSFloatAttributeType:
         case NSDecimalAttributeType: {
             NSNumber *number = [self.entity valueForKey:attribute];
+            if (!number) {
+                return @"";
+            }
+            
             return [NSString stringWithFormat:@"%@", number];
             break;
         } case NSDateAttributeType:
