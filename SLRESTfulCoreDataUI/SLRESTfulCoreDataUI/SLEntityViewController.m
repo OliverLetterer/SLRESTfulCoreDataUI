@@ -796,6 +796,8 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         self.navigationItem.rightBarButtonItem = previousBarButtonItem;
         self.navigationItem.leftBarButtonItem.enabled = YES;
         self.view.userInteractionEnabled = YES;
+        
+        [[UIApplication sharedApplication] sendAction:@selector(resignFirstResponder) to:nil from:nil forEvent:nil];
     };
     
     void(^completionHandler)(id managedObject, NSError *error) = ^(id managedObject, NSError *error) {
