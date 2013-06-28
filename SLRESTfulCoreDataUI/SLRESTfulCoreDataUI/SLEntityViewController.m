@@ -66,6 +66,11 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 #pragma mark - setters and getters
 
+- (BOOL)canEditProperty:(NSString *)property
+{
+    return YES;
+}
+
 - (UIBarButtonItem *)activityIndicatorBarButtonItem
 {
     UIActivityIndicatorView *activityIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
@@ -383,6 +388,12 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     id propertyDescription = self.propertyDescriptions[self.showingProperties[indexPath.row]];
+    
+    if (![self canEditProperty:[propertyDescription name]]) {
+        [tableView deselectRowAtIndexPath:indexPath animated:NO];
+        return;
+    }
+    
     if ([propertyDescription isKindOfClass:[NSAttributeDescription class]]) {
         NSAttributeDescription *attributeDescription = propertyDescription;
         
@@ -461,6 +472,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         return objc_msgSend(self, selector, tableView, indexPath);
     }
     
+    BOOL canEditProperty = [self canEditProperty:attributeDescription.name];
     BOOL useEnum = [self _attributeDescriptionRequiresEnum:attributeDescription];
     
     BOOL useTextFieldCell = [self _attributeDescriptionRequiresTextField:attributeDescription];
@@ -532,6 +544,23 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         return cell;
     }
     
+    if (!canEditProperty) {
+        static NSString *CellIdentifier = @"SLEntityTableViewCellNotEditable";
+        
+        SLEntityTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+        if (cell == nil) {
+            cell = [[SLEntityTableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
+            
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+            cell.accessoryType = UITableViewCellAccessoryNone;
+        }
+        
+        cell.textLabel.text = self.propertyMapping[attributeDescription.name];
+        cell.detailTextLabel.text = [self stringValueForAttribute:attributeDescription.name];
+        
+        return cell;
+    }
+    
     NSAssert(NO, @"attribute %@ is not supported by SLEntityViewController", attributeDescription);
     return nil;
 }
@@ -547,6 +576,8 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     if ([self respondsToSelector:selector]) {
         return objc_msgSend(self, selector, tableView, indexPath);
     }
+    
+    BOOL canEditProperty = [self canEditProperty:relationshipDescription.name];
     
     static NSString *CellIdentifier = @"SLEntityTableViewCell";
     
@@ -564,7 +595,13 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         cell.detailTextLabel.text = [[self.entity valueForKey:relationshipDescription.name] valueForKey:nameKeyPath];
     }
     
-    cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+    if (canEditProperty) {
+        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        cell.selectionStyle = UITableViewCellSelectionStyleBlue;
+    } else {
+        cell.accessoryType = UITableViewCellAccessoryNone;
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+    }
     
     return cell;
 }
@@ -927,7 +964,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     NSArray *enumOptions = [self enumOptionsForAttribute:attributeDescription.name];
     NSArray *enumValues = [self enumValuesForAttribute:attributeDescription.name];
     
-    return enumOptions != nil && enumValues != nil;
+    return enumOptions != nil && enumValues != nil && [self canEditProperty:attributeDescription.name];
 }
 
 - (BOOL)_attributeDescriptionRequiresTextField:(NSAttributeDescription *)attributeDescription
@@ -946,7 +983,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
                                 ];
     }
     
-    return [textFieldAttributes containsObject:@(attributeDescription.attributeType)] && ![self _attributeDescriptionRequiresEnum:attributeDescription];
+    return [textFieldAttributes containsObject:@(attributeDescription.attributeType)] && ![self _attributeDescriptionRequiresEnum:attributeDescription] && [self canEditProperty:attributeDescription.name];
 }
 
 - (void)_applyDiffUpdateToTableViewWithVisbleProperties:(NSArray *)visibleProperties previousVisibleProperties:(NSArray *)previousVisibleProperties

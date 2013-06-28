@@ -98,6 +98,11 @@ typedef NS_ENUM(NSUInteger, SLEntityViewControllerEditingType) {
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForAttributeDescription:(NSAttributeDescription *)attributeDescription atIndexPath:(NSIndexPath *)indexPath;
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRelationshipDescription:(NSAttributeDescription *)attributeDescription atIndexPath:(NSIndexPath *)indexPath;
 
+/**
+ Configuring, if a property is editable or readonly.
+ */
+- (BOOL)canEditProperty:(NSString *)property;
+
 @property (nonatomic, readonly) UIBarButtonItem *activityIndicatorBarButtonItem;
 - (void)cancelButtonClicked:(UIBarButtonItem *)sender;
 - (void)saveButtonClicked:(UIBarButtonItem *)sender;
