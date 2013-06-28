@@ -462,10 +462,10 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (NSString *)propertyNameForTextField:(UITextField *)textField
 {
-    NSString *attributeName = objc_getAssociatedObject(textField, &SLEntityViewControllerAttributeDescriptionKey);
-    NSParameterAssert(attributeName);
+    NSAttributeDescription *attribute = objc_getAssociatedObject(textField, &SLEntityViewControllerAttributeDescriptionKey);
+    NSParameterAssert(attribute);
     
-    return attributeName;
+    return attribute.name;
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForAttributeDescription:(NSAttributeDescription *)attributeDescription atIndexPath:(NSIndexPath *)indexPath
