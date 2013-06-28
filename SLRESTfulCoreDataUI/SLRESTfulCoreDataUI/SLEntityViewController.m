@@ -460,6 +460,14 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 #pragma mark - Instance methods
 
+- (NSString *)propertyNameForTextField:(UITextField *)textField
+{
+    NSString *attributeName = objc_getAssociatedObject(textField, @selector(property));
+    NSParameterAssert(attributeName);
+    
+    return attributeName;
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForAttributeDescription:(NSAttributeDescription *)attributeDescription atIndexPath:(NSIndexPath *)indexPath
 {
     NSString *firstLetter = [attributeDescription.name substringToIndex:1];
@@ -484,6 +492,10 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         if (cell == nil) {
             cell = [[SLEntityTextFieldCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
             
+            objc_setAssociatedObject(cell.textField, @selector(property),
+                                     attributeDescription.name, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+            
+            cell.textField.delegate = self;
             [cell.textField addTarget:self action:@selector(_textFieldEditingChanged:) forControlEvents:UIControlEventEditingChanged];
         }
         
@@ -915,6 +927,8 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     
     return nil;
 }
+
+#pragma mark - UITextFieldDelegate
 
 #pragma mark - SLSelectEnumAttributeViewControllerDelegate
 
