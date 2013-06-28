@@ -79,6 +79,10 @@
 {
     [super viewDidLoad];
     
+    UIView *tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 0.0f, 1.0f)];
+    tableFooterView.backgroundColor = [UIColor clearColor];
+    self.tableView.tableFooterView = tableFooterView;
+    
     if ([self.tableView respondsToSelector:@selector(setRestorationIdentifier:)]) {
         self.tableView.restorationIdentifier = NSStringFromClass(self.tableView.class);
     }

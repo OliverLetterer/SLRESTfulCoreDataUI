@@ -397,6 +397,13 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
             viewController.modalInPopover = self.modalInPopover;
             viewController.contentSizeForViewInPopover = self.contentSizeForViewInPopover;
             viewController.view.backgroundColor = self.view.backgroundColor;
+            viewController.tableView.separatorColor = self.tableView.separatorColor;
+            viewController.tableView.separatorStyle = self.tableView.separatorStyle;
+            
+            if ([self.tableView.backgroundView isKindOfClass:[UIImageView class]]) {
+                UIImageView *imageView = (UIImageView *)self.tableView.backgroundView;
+                viewController.tableView.backgroundView = [[UIImageView alloc] initWithImage:imageView.image];
+            }
             
             objc_setAssociatedObject(viewController, &SLEntityViewControllerAttributeDescriptionKey,
                                      attributeDescription, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -427,6 +434,11 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         viewController.view.backgroundColor = self.view.backgroundColor;
         viewController.tableView.separatorColor = self.tableView.separatorColor;
         viewController.tableView.separatorStyle = self.tableView.separatorStyle;
+        
+        if ([self.tableView.backgroundView isKindOfClass:[UIImageView class]]) {
+            UIImageView *imageView = (UIImageView *)self.tableView.backgroundView;
+            viewController.tableView.backgroundView = [[UIImageView alloc] initWithImage:imageView.image];
+        }
         
         [self.navigationController pushViewController:viewController animated:YES];
         return;
