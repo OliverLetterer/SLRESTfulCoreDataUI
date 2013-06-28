@@ -462,7 +462,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (NSString *)propertyNameForTextField:(UITextField *)textField
 {
-    NSString *attributeName = objc_getAssociatedObject(textField, @selector(property));
+    NSString *attributeName = objc_getAssociatedObject(textField, &SLEntityViewControllerAttributeDescriptionKey);
     NSParameterAssert(attributeName);
     
     return attributeName;
@@ -491,9 +491,6 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         SLEntityTextFieldCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
         if (cell == nil) {
             cell = [[SLEntityTextFieldCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
-            
-            objc_setAssociatedObject(cell.textField, @selector(property),
-                                     attributeDescription.name, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
             
             cell.textField.delegate = self;
             [cell.textField addTarget:self action:@selector(_textFieldEditingChanged:) forControlEvents:UIControlEventEditingChanged];
