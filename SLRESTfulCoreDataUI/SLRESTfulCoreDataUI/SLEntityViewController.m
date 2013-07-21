@@ -410,6 +410,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
             viewController.view.backgroundColor = self.view.backgroundColor;
             viewController.tableView.separatorColor = self.tableView.separatorColor;
             viewController.tableView.separatorStyle = self.tableView.separatorStyle;
+            viewController.tableView.rowHeight = self.tableView.rowHeight;
             
             if ([self.tableView.backgroundView isKindOfClass:[UIImageView class]]) {
                 UIImageView *imageView = (UIImageView *)self.tableView.backgroundView;
@@ -445,6 +446,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         viewController.view.backgroundColor = self.view.backgroundColor;
         viewController.tableView.separatorColor = self.tableView.separatorColor;
         viewController.tableView.separatorStyle = self.tableView.separatorStyle;
+        viewController.tableView.rowHeight = self.tableView.rowHeight;
         
         if ([self.tableView.backgroundView isKindOfClass:[UIImageView class]]) {
             UIImageView *imageView = (UIImageView *)self.tableView.backgroundView;
