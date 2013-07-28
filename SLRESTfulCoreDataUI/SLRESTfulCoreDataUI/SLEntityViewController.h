@@ -43,7 +43,7 @@ typedef NS_ENUM(NSUInteger, SLEntityViewControllerEditingType) {
 
 @property (nonatomic, readonly) SLEntityViewControllerEditingType editingType;
 
-@property (nonatomic, readonly) id entity;
+@property (nonatomic, strong) id entity;
 
 @property (nonatomic, copy) void(^completionHandler)(BOOL didSaveEntity);
 
