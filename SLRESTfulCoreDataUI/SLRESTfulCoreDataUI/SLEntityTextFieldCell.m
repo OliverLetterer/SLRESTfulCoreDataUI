@@ -74,8 +74,10 @@
     center.y = CGRectGetMidY(self.contentView.bounds);
     self.textLabel.center = center;
     
-    self.textField.frame = CGRectMake(CGRectGetMaxX(self.textLabel.frame) + 8.0f, 8.0f,
-                                      CGRectGetWidth(self.contentView.bounds) - CGRectGetMaxX(self.textLabel.frame) - 16.0f, CGRectGetHeight(self.contentView.bounds) - 16.0f);
+    self.textField.frame = CGRectMake(CGRectGetMaxX(self.textLabel.frame) + 7.0f,
+                                      14.0f,
+                                      CGRectGetWidth(self.contentView.bounds) - CGRectGetMaxX(self.textLabel.frame) - 7.0f - 14.0f,
+                                      CGRectGetHeight(self.contentView.bounds) - 2.0f * 14.0f);
 }
 
 //- (void)prepareForReuse
