@@ -357,7 +357,12 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         self.properties = @[];
         self.title = _editingType == SLEntityViewControllerEditingTypeCreate ? NSLocalizedString(@"Create", @"") : NSLocalizedString(@"Edit", @"");
         
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_7_0
+        self.preferredContentSize = CGSizeMake(320.0f, 480.0f);
+#else
         self.contentSizeForViewInPopover = CGSizeMake(320.0f, 480.0f);
+#endif
+        
         self.modalInPopover = YES;
         
         if ([self respondsToSelector:@selector(setRestorationIdentifier:)]) {
@@ -560,7 +565,13 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
             viewController.title = self.propertyMapping[attributeDescription.name];
             
             viewController.modalInPopover = self.modalInPopover;
+            
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_7_0
+            viewController.preferredContentSize = self.preferredContentSize;
+#else
             viewController.contentSizeForViewInPopover = self.contentSizeForViewInPopover;
+#endif
+            
             viewController.view.backgroundColor = self.view.backgroundColor;
             viewController.tableView.separatorColor = self.tableView.separatorColor;
             viewController.tableView.separatorStyle = self.tableView.separatorStyle;
@@ -600,7 +611,13 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
                                                                                                                                        keyPathForName:nameKeyPath];
         viewController.title = self.propertyMapping[relationshipDescription.name];
         viewController.modalInPopover = self.modalInPopover;
+        
+#if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_7_0
+        viewController.preferredContentSize = self.preferredContentSize;
+#else
         viewController.contentSizeForViewInPopover = self.contentSizeForViewInPopover;
+#endif
+        
         viewController.view.backgroundColor = self.view.backgroundColor;
         viewController.tableView.separatorColor = self.tableView.separatorColor;
         viewController.tableView.separatorStyle = self.tableView.separatorStyle;
