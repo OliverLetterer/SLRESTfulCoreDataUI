@@ -1,7 +1,7 @@
 Pod::Spec.new do |spec|
   spec.name         = 'SLRESTfulCoreDataUI'
   spec.version      = '1.5.2'
-  spec.platform     = :ios, '5.0'
+  spec.platform     = :ios, '6.0'
   spec.license      = 'MIT'
   spec.source       = { :git => 'https://github.com/OliverLetterer/SLRESTfulCoreDataUI.git', :tag => spec.version.to_s }
   spec.source_files = 'SLRESTfulCoreDataUI/SLRESTfulCoreDataUI/*.{h,m}'
