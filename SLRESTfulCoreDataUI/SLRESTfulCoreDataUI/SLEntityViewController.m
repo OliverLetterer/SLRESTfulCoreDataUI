@@ -560,37 +560,39 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         NSArray *enumValues = [self enumValuesForAttribute:attributeDescription.name];
         
         if (enumOptions && enumValues) {
-            SLSelectEnumAttributeViewController *viewController = [[SLSelectEnumAttributeViewController alloc] initWithOptions:enumOptions values:enumValues currentValue:[self.entity valueForKey:attributeDescription.name]];
-            viewController.delegate = self;
-            viewController.title = self.propertyMapping[attributeDescription.name];
-            
-            viewController.modalInPopover = self.modalInPopover;
-            
+            if (enumOptions.count > 1) {
+                SLSelectEnumAttributeViewController *viewController = [[SLSelectEnumAttributeViewController alloc] initWithOptions:enumOptions values:enumValues currentValue:[self.entity valueForKey:attributeDescription.name]];
+                viewController.delegate = self;
+                viewController.title = self.propertyMapping[attributeDescription.name];
+                
+                viewController.modalInPopover = self.modalInPopover;
+                
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_7_0
-            viewController.preferredContentSize = self.preferredContentSize;
+                viewController.preferredContentSize = self.preferredContentSize;
 #else
-            viewController.contentSizeForViewInPopover = self.contentSizeForViewInPopover;
+                viewController.contentSizeForViewInPopover = self.contentSizeForViewInPopover;
 #endif
-            
-            viewController.view.backgroundColor = self.view.backgroundColor;
-            viewController.tableView.separatorColor = self.tableView.separatorColor;
-            viewController.tableView.separatorStyle = self.tableView.separatorStyle;
-            viewController.tableView.rowHeight = self.tableView.rowHeight;
-            
-            if ([self.view respondsToSelector:@selector(tintColor)]) {
-                viewController.view.tintColor = self.view.tintColor;
+                
+                viewController.view.backgroundColor = self.view.backgroundColor;
+                viewController.tableView.separatorColor = self.tableView.separatorColor;
+                viewController.tableView.separatorStyle = self.tableView.separatorStyle;
+                viewController.tableView.rowHeight = self.tableView.rowHeight;
+                
+                if ([self.view respondsToSelector:@selector(tintColor)]) {
+                    viewController.view.tintColor = self.view.tintColor;
+                }
+                
+                if ([self.tableView.backgroundView isKindOfClass:[UIImageView class]]) {
+                    UIImageView *imageView = (UIImageView *)self.tableView.backgroundView;
+                    viewController.tableView.backgroundView = [[UIImageView alloc] initWithImage:imageView.image];
+                }
+                
+                objc_setAssociatedObject(viewController, &SLEntityViewControllerAttributeDescriptionKey,
+                                         attributeDescription, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+                
+                [self.navigationController pushViewController:viewController animated:YES];
+                return;
             }
-            
-            if ([self.tableView.backgroundView isKindOfClass:[UIImageView class]]) {
-                UIImageView *imageView = (UIImageView *)self.tableView.backgroundView;
-                viewController.tableView.backgroundView = [[UIImageView alloc] initWithImage:imageView.image];
-            }
-            
-            objc_setAssociatedObject(viewController, &SLEntityViewControllerAttributeDescriptionKey,
-                                     attributeDescription, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-            
-            [self.navigationController pushViewController:viewController animated:YES];
-            return;
         }
         
         Class viewControllerClass = [self viewControllerClassForAttribute:attributeDescription.name];
@@ -709,9 +711,16 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         }
         
         cell.textLabel.text = self.propertyMapping[attributeDescription.name];
-        
         cell.detailTextLabel.text = [self stringValueForAttribute:attributeDescription.name];
-        cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+        
+        NSArray *enumOptions = [self enumOptionsForAttribute:attributeDescription.name];
+        if (enumOptions.count > 1) {
+            cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
+            cell.selectionStyle = UITableViewCellSelectionStyleBlue;
+        } else {
+            cell.accessoryType = UITableViewCellAccessoryNone;
+            cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        }
         
         return cell;
     }
