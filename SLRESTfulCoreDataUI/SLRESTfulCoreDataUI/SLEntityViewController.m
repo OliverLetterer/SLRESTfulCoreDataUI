@@ -957,7 +957,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (void)onlyShowAttribute:(NSString *)attribute whenPredicateEvaluates:(NSPredicate *)predicate
 {
-    NSAssert([self.properties containsObject:attribute], @"%@ not included in configured properties: %@", attribute, self.properties);
+    NSAssert([self _propertiesContainAttribute:attribute], @"%@ not included in configured properties: %@", attribute, self.properties);
     
     self.predicates[attribute] = predicate;
     [self _updateVisibleSectionsAnimated:NO];
@@ -970,7 +970,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (void)setFetchedResultsController:(NSFetchedResultsController *)fetchedResultsController forRelationship:(NSString *)relationship
 {
-    NSAssert([self.properties containsObject:relationship], @"%@ not included in configured properties: %@", relationship, self.properties);
+    NSAssert([self _propertiesContainAttribute:relationship], @"%@ not included in configured properties: %@", relationship, self.properties);
     
     self.fetchedResultsControllers[relationship] = fetchedResultsController;
 }
@@ -982,7 +982,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (void)setNameKeyPath:(NSString *)nameKeyPath forRelationship:(NSString *)relationship
 {
-    NSAssert([self.properties containsObject:relationship], @"%@ not included in configured properties: %@", relationship, self.properties);
+    NSAssert([self _propertiesContainAttribute:relationship], @"%@ not included in configured properties: %@", relationship, self.properties);
     
     self.relationshipNameKeyPaths[relationship] = nameKeyPath;
 }
@@ -1283,6 +1283,17 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (NSArray *)_propertiesInSection:(NSInteger)section
 {
     return [self _sectionAtIndex:section].properties;
+}
+
+- (BOOL)_propertiesContainAttribute:(NSString *)attribute
+{
+    for (_SLEntityViewControllerSectionInfo *sectionInfo in self.sections) {
+        if ([sectionInfo.properties containsObject:attribute]) {
+            return YES;
+        }
+    }
+    
+    return NO;
 }
 
 @end
