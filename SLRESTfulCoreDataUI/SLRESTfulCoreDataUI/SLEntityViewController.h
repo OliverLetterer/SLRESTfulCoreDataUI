@@ -96,9 +96,11 @@ typedef NS_ENUM(NSUInteger, SLEntityViewControllerEditingType) {
 - (id)initWithEntity:(NSManagedObject *)entity editingType:(SLEntityViewControllerEditingType)editingType;
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForAttributeDescription:(NSAttributeDescription *)attributeDescription atIndexPath:(NSIndexPath *)indexPath;
-- (UITableViewCell *)tableView:(UITableView *)tableView cellForRelationshipDescription:(NSAttributeDescription *)attributeDescription atIndexPath:(NSIndexPath *)indexPath;
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRelationshipDescription:(NSRelationshipDescription *)attributeDescription atIndexPath:(NSIndexPath *)indexPath;
 
 - (NSString *)propertyNameForTextField:(UITextField *)textField;
+
+- (NSString *)propertyForIndexPath:(NSIndexPath *)indexPath;
 
 /**
  Configuring, if a property is editable or readonly.

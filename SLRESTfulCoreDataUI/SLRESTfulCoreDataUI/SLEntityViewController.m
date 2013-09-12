@@ -545,7 +545,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    NSString *property = [self _propertiesInSection:indexPath.section][indexPath.row];
+    NSString *property = [self propertyForIndexPath:indexPath];
     id propertyDescription = self.propertyDescriptions[property];
     
     if (![self canEditProperty:[propertyDescription name]]) {
@@ -649,6 +649,11 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     NSParameterAssert(attribute);
     
     return attribute.name;
+}
+
+- (NSString *)propertyForIndexPath:(NSIndexPath *)indexPath
+{
+    return [self _propertiesInSection:indexPath.section][indexPath.row];
 }
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForAttributeDescription:(NSAttributeDescription *)attributeDescription atIndexPath:(NSIndexPath *)indexPath
@@ -1237,9 +1242,6 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
                 [insertedIndexPaths addObject:[NSIndexPath indexPathForRow:[visibleProperties indexOfObject:property]
                                                                  inSection:previousVisibleSectionIndex]];
             }
-            
-            NSLog(@"deletedIndexPaths: %@", deletedIndexPaths);
-            NSLog(@"insertedIndexPaths: %@", insertedIndexPaths);
             
             [self.tableView deleteRowsAtIndexPaths:deletedIndexPaths withRowAnimation:UITableViewRowAnimationTop];
             [self.tableView insertRowsAtIndexPaths:insertedIndexPaths withRowAnimation:UITableViewRowAnimationTop];
