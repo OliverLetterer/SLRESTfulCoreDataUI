@@ -62,7 +62,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         return NO;
     }
     return [self isEqualToSection:object];
-    
+
 }
 
 - (BOOL)isEqualToSection:(_SLEntityViewControllerSectionInfo *)object
@@ -79,18 +79,18 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     if (![self.properties isEqual:object.properties] && self.properties != object.properties) {
         return NO;
     }
-    
+
     return YES;
 }
 
 - (NSUInteger)hash
 {
     NSUInteger hash = 0;
-    
+
     hash += self.titleText.hash;
     hash += self.footerText.hash;
     hash += self.properties.hash;
-    
+
     return hash;
 }
 
@@ -132,7 +132,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 {
     if (entity != _entity) {
         _entity = entity;
-        
+
         [self _updateVisibleSectionsAnimated:NO];
     }
 }
@@ -146,7 +146,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 {
     UIActivityIndicatorView *activityIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
     [activityIndicatorView startAnimating];
-    
+
     return [[UIBarButtonItem alloc] initWithCustomView:activityIndicatorView];
 }
 
@@ -155,7 +155,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     if (!_viewControllerClasses) {
         _viewControllerClasses = [NSMutableDictionary dictionary];
     }
-    
+
     return _viewControllerClasses;
 }
 
@@ -164,7 +164,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     if (!_fetchedResultsControllers) {
         _fetchedResultsControllers = [NSMutableDictionary dictionary];
     }
-    
+
     return _fetchedResultsControllers;
 }
 
@@ -173,7 +173,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     if (!_relationshipNameKeyPaths) {
         _relationshipNameKeyPaths = [NSMutableDictionary dictionary];
     }
-    
+
     return _relationshipNameKeyPaths;
 }
 
@@ -182,7 +182,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     if (!_keyboardTypes) {
         _keyboardTypes = [NSMutableDictionary dictionary];
     }
-    
+
     return _keyboardTypes;
 }
 
@@ -191,7 +191,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     if (!_enumValues) {
         _enumValues = [NSMutableDictionary dictionary];
     }
-    
+
     return _enumValues;
 }
 
@@ -200,7 +200,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     if (!_enumOptions) {
         _enumOptions = [NSMutableDictionary dictionary];
     }
-    
+
     return _enumOptions;
 }
 
@@ -209,7 +209,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     if (!_enumOptionsValueMappings) {
         _enumOptionsValueMappings = [NSMutableDictionary dictionary];
     }
-    
+
     return _enumOptionsValueMappings;
 }
 
@@ -218,7 +218,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     if (!_predicates) {
         _predicates = [NSMutableDictionary dictionary];
     }
-    
+
     return _predicates;
 }
 
@@ -226,30 +226,30 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 {
     if (properties != _properties) {
         _properties = properties;
-        
+
         NSMutableDictionary *propertyDescriptions = [NSMutableDictionary dictionaryWithCapacity:_properties.count];
-        
+
         if (_properties.count > 0) {
             id firstObject = _properties[0];
-            
+
             if ([firstObject isKindOfClass:[NSString class]]) {
                 for (NSString *propertyName in _properties) {
                     NSPropertyDescription *propertyDescription = self.entityDescription.propertiesByName[propertyName];
                     NSAssert(propertyDescription != nil, @"propertyDescription for key %@ cannot be nil", propertyName);
-                    
+
                     propertyDescriptions[propertyName] = propertyDescription;
                 }
-                
+
                 _SLEntityViewControllerSectionInfo *section = [[_SLEntityViewControllerSectionInfo alloc] init];
                 section.properties = _properties;
-                
+
                 self.sections = @[ section ];
             } else {
                 NSMutableArray *sections = [NSMutableArray arrayWithCapacity:_properties.count];
-                
+
                 for (NSArray *sectionArray in _properties) {
                     NSAssert(sectionArray.count > 0, @"section %@ of sections %@ cannot contain zero objects", sectionArray, _properties);
-                    
+
                     BOOL sectionArrayContainsHeaderOrFooterText = NO;
                     for (id object in sectionArray) {
                         if ([object isKindOfClass:[NSArray class]]) {
@@ -257,16 +257,16 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
                             break;
                         }
                     }
-                    
+
                     _SLEntityViewControllerSectionInfo *sectionInfo = [[_SLEntityViewControllerSectionInfo alloc] init];
-                    
+
                     if (!sectionArrayContainsHeaderOrFooterText) {
                         sectionInfo.properties = sectionArray;
-                        
+
                         for (NSString *propertyName in sectionArray) {
                             NSPropertyDescription *propertyDescription = self.entityDescription.propertiesByName[propertyName];
                             NSAssert(propertyDescription != nil, @"propertyDescription for key %@ cannot be nil", propertyName);
-                            
+
                             propertyDescriptions[propertyName] = propertyDescription;
                         }
                     } else {
@@ -279,24 +279,24 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
                                 }
                             } else if ([object isKindOfClass:[NSArray class]]) {
                                 sectionInfo.properties = object;
-                                
+
                                 for (NSString *propertyName in object) {
                                     NSPropertyDescription *propertyDescription = self.entityDescription.propertiesByName[propertyName];
                                     NSAssert(propertyDescription != nil, @"propertyDescription for key %@ cannot be nil", propertyName);
-                                    
+
                                     propertyDescriptions[propertyName] = propertyDescription;
                                 }
                             }
                         }];
                     }
-                    
+
                     [sections addObject:sectionInfo];
                 }
-                
+
                 self.sections = [sections copy];
             }
         }
-        
+
         self.propertyDescriptions = propertyDescriptions;
     }
 }
@@ -305,11 +305,11 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 {
     if (propertyMapping != _propertyMapping) {
         _propertyMapping = propertyMapping;
-        
+
         self.properties = [_propertyMapping.allKeys sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
             NSString *value1 = _propertyMapping[obj1];
             NSString *value2 = _propertyMapping[obj2];
-            
+
             return [value1 caseInsensitiveCompare:value2];
         }];
     }
@@ -319,7 +319,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 {
     if (sections != _sections) {
         _sections = sections;
-        
+
         [self _updateVisibleSectionsAnimated:NO];
     }
 }
@@ -329,7 +329,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     if (![sections isEqualToArray:_visibleSections]) {
         NSArray *previousSecions = _visibleSections;
         _visibleSections = sections;
-        
+
         if (self.isViewLoaded) {
             if (self.view.window && animateDiff) {
                 [self _applyDiffUpdateToTableViewWithVisibleSections:_visibleSections previousVisibleSections:previousSecions];
@@ -345,26 +345,26 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (id)initWithEntity:(NSManagedObject *)entity editingType:(SLEntityViewControllerEditingType)editingType
 {
     NSParameterAssert(entity);
-    
+
     if (self = [self initWithStyle:UITableViewStylePlain]) {
         _entity = entity;
         _editingType = editingType;
-        
+
         self.entityDescription = [NSEntityDescription entityForName:NSStringFromClass(entity.class)
                                              inManagedObjectContext:entity.managedObjectContext];
         NSParameterAssert(self.entityDescription);
-        
+
         self.properties = @[];
         self.title = _editingType == SLEntityViewControllerEditingTypeCreate ? NSLocalizedString(@"Create", @"") : NSLocalizedString(@"Edit", @"");
-        
+
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_7_0
         self.preferredContentSize = CGSizeMake(320.0f, 480.0f);
 #else
         self.contentSizeForViewInPopover = CGSizeMake(320.0f, 480.0f);
 #endif
-        
+
         self.modalInPopover = YES;
-        
+
         if ([self respondsToSelector:@selector(setRestorationIdentifier:)]) {
             self.restorationIdentifier = NSStringFromClass(self.class);
             self.restorationClass = self.class;
@@ -378,7 +378,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
-    
+
 }
 
 #pragma mark - View lifecycle
@@ -392,10 +392,10 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
+
     self.navigationItem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemCancel target:self action:@selector(cancelButtonClicked:)];
     self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemSave target:self action:@selector(saveButtonClicked:)];
-    
+
     if ([self.tableView respondsToSelector:@selector(setRestorationIdentifier:)]) {
         self.tableView.restorationIdentifier = NSStringFromClass(self.tableView.class);
     }
@@ -404,31 +404,31 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (void)viewDidUnload
 {
     [super viewDidUnload];
-    
+
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    
+
     [self.tableView reloadData];
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    
+
     for (NSString *property in self.properties) {
         NSAttributeDescription *attributeDescription = self.propertyDescriptions[property];
-        
+
         if (![attributeDescription isKindOfClass:[NSAttributeDescription class]]) {
             continue;
         }
-        
+
         if (![self _attributeDescriptionRequiresTextField:attributeDescription] || [self stringValueForAttribute:property].length > 0) {
             continue;
         }
-        
+
         NSInteger index = [self.properties indexOfObject:property];
         SLEntityTextFieldCell *cell = (SLEntityTextFieldCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
         if ([cell isKindOfClass:[SLEntityTextFieldCell class]]) {
@@ -441,13 +441,13 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
-    
+
 }
 
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
-    
+
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -486,13 +486,13 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 {
     NSString *property = [self _propertiesInSection:indexPath.section][indexPath.row];
     id propertyDescription = self.propertyDescriptions[property];
-    
+
     if ([propertyDescription isKindOfClass:[NSAttributeDescription class]]) {
         return [self tableView:tableView cellForAttributeDescription:propertyDescription atIndexPath:indexPath];
     } else if ([propertyDescription isKindOfClass:[NSRelationshipDescription class]]) {
         return [self tableView:tableView cellForRelationshipDescription:propertyDescription atIndexPath:indexPath];
     }
-    
+
     NSAssert(NO, @"propertyDescription %@ is not supported", propertyDescription);
     return nil;
 }
@@ -547,56 +547,56 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 {
     NSString *property = [self propertyForIndexPath:indexPath];
     id propertyDescription = self.propertyDescriptions[property];
-    
+
     if (![self canEditProperty:[propertyDescription name]]) {
         [tableView deselectRowAtIndexPath:indexPath animated:NO];
         return;
     }
-    
+
     if ([propertyDescription isKindOfClass:[NSAttributeDescription class]]) {
         NSAttributeDescription *attributeDescription = propertyDescription;
-        
+
         NSArray *enumOptions = [self enumOptionsForAttribute:attributeDescription.name];
         NSArray *enumValues = [self enumValuesForAttribute:attributeDescription.name];
-        
+
         if (enumOptions && enumValues) {
             if (enumOptions.count > 1) {
                 SLSelectEnumAttributeViewController *viewController = [[SLSelectEnumAttributeViewController alloc] initWithOptions:enumOptions values:enumValues currentValue:[self.entity valueForKey:attributeDescription.name]];
                 viewController.delegate = self;
                 viewController.title = self.propertyMapping[attributeDescription.name];
-                
+
                 viewController.modalInPopover = self.modalInPopover;
-                
+
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_7_0
                 viewController.preferredContentSize = self.preferredContentSize;
 #else
                 viewController.contentSizeForViewInPopover = self.contentSizeForViewInPopover;
 #endif
-                
+
                 viewController.view.backgroundColor = self.view.backgroundColor;
                 viewController.tableView.separatorColor = self.tableView.separatorColor;
                 viewController.tableView.separatorStyle = self.tableView.separatorStyle;
                 viewController.tableView.rowHeight = self.tableView.rowHeight;
-                
+
                 if ([self.view respondsToSelector:@selector(tintColor)]) {
                     viewController.view.tintColor = self.view.tintColor;
                 }
-                
+
                 if ([self.tableView.backgroundView isKindOfClass:[UIImageView class]]) {
                     UIImageView *imageView = (UIImageView *)self.tableView.backgroundView;
                     viewController.tableView.backgroundView = [[UIImageView alloc] initWithImage:imageView.image];
                 }
-                
+
                 objc_setAssociatedObject(viewController, &SLEntityViewControllerAttributeDescriptionKey,
                                          attributeDescription, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-                
+
                 [self.navigationController pushViewController:viewController animated:YES];
                 return;
             }
         }
-        
+
         Class viewControllerClass = [self viewControllerClassForAttribute:attributeDescription.name];
-        
+
         if (viewControllerClass) {
             UIViewController<SLSelectEntityAttributeViewControllerProtocol> *viewController = [[viewControllerClass alloc] initWithEntity:self.entity attribute:attributeDescription.name];
             [self.navigationController pushViewController:viewController animated:YES];
@@ -604,40 +604,49 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         }
     } else if ([propertyDescription isKindOfClass:[NSRelationshipDescription class]]) {
         NSRelationshipDescription *relationshipDescription = propertyDescription;
+
+        Class viewControllerClass = [self viewControllerClassForAttribute:relationshipDescription.name];
+
+        if (viewControllerClass) {
+            UIViewController<SLSelectEntityAttributeViewControllerProtocol> *viewController = [[viewControllerClass alloc] initWithEntity:self.entity attribute:relationshipDescription.name];
+            [self.navigationController pushViewController:viewController animated:YES];
+            return;
+        }
+
         NSFetchedResultsController *fetchedResultsController = [self fetchedResultsControllerForRelationship:relationshipDescription.name];
         NSString *nameKeyPath = [self nameKeyPathForRelationship:relationshipDescription.name];
-        
+
         SLSelectRelationshipEntityViewController *viewController = [[SLSelectRelationshipEntityViewController alloc] initWithFetchedResultsController:fetchedResultsController
                                                                                                                               relationshipDescription:relationshipDescription
                                                                                                                                                entity:self.entity
                                                                                                                                        keyPathForName:nameKeyPath];
         viewController.title = self.propertyMapping[relationshipDescription.name];
         viewController.modalInPopover = self.modalInPopover;
-        
+
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_7_0
         viewController.preferredContentSize = self.preferredContentSize;
 #else
         viewController.contentSizeForViewInPopover = self.contentSizeForViewInPopover;
 #endif
-        
+
         viewController.view.backgroundColor = self.view.backgroundColor;
         viewController.tableView.separatorColor = self.tableView.separatorColor;
         viewController.tableView.separatorStyle = self.tableView.separatorStyle;
         viewController.tableView.rowHeight = self.tableView.rowHeight;
-        
+
         if ([self.view respondsToSelector:@selector(tintColor)]) {
             viewController.view.tintColor = self.view.tintColor;
         }
-        
+
         if ([self.tableView.backgroundView isKindOfClass:[UIImageView class]]) {
             UIImageView *imageView = (UIImageView *)self.tableView.backgroundView;
             viewController.tableView.backgroundView = [[UIImageView alloc] initWithImage:imageView.image];
         }
-        
+
         [self.navigationController pushViewController:viewController animated:YES];
         return;
     }
-    
+
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
 }
 
@@ -647,7 +656,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 {
     NSAttributeDescription *attribute = objc_getAssociatedObject(textField, &SLEntityViewControllerAttributeDescriptionKey);
     NSParameterAssert(attribute);
-    
+
     return attribute.name;
 }
 
@@ -660,64 +669,64 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 {
     NSString *firstLetter = [attributeDescription.name substringToIndex:1];
     NSString *restString = [attributeDescription.name substringFromIndex:1];
-    
+
     NSString *selectorName = [NSString stringWithFormat:@"tableView:cellFor%@%@AtIndexPath:", firstLetter.uppercaseString, restString];
     SEL selector = NSSelectorFromString(selectorName);
-    
+
     if ([self respondsToSelector:selector]) {
         return objc_msgSend(self, selector, tableView, indexPath);
     }
-    
+
     BOOL canEditProperty = [self canEditProperty:attributeDescription.name];
     BOOL useEnum = [self _attributeDescriptionRequiresEnum:attributeDescription];
-    
+
     BOOL useTextFieldCell = [self _attributeDescriptionRequiresTextField:attributeDescription];
-    
+
     if (useTextFieldCell) {
         static NSString *CellIdentifier = @"SLEntityTextFieldCell";
-        
+
         SLEntityTextFieldCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
         if (cell == nil) {
             cell = [[SLEntityTextFieldCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
-            
+
             cell.textField.delegate = self;
             [cell.textField addTarget:self action:@selector(_textFieldEditingChanged:) forControlEvents:UIControlEventEditingChanged];
         }
-        
+
         cell.textLabel.text = self.propertyMapping[attributeDescription.name];
-        
+
         objc_setAssociatedObject(cell.textField, &SLEntityViewControllerAttributeDescriptionKey,
                                  attributeDescription, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        
+
         cell.textField.text = [self stringValueForAttribute:attributeDescription.name];
         cell.textField.placeholder = cell.textLabel.text;
         cell.textField.autocapitalizationType = UITextAutocapitalizationTypeSentences;
         cell.textField.keyboardType = [self keyboardTypeForAttribute:attributeDescription.name];
         cell.textField.autocorrectionType = UITextAutocorrectionTypeNo;
-        
+
         if (attributeDescription.attributeType == NSDateAttributeType) {
             UIDatePicker *datePicker = [[UIDatePicker alloc] init];
             datePicker.datePickerMode = UIDatePickerModeDateAndTime;
-            
+
             cell.textField.inputAccessoryView = datePicker;
         } else {
             cell.textField.inputAccessoryView = nil;
         }
-        
+
         [self configureTextFieldCell:cell forAttribute:attributeDescription.name];
-        
+
         return cell;
     } else if (useEnum) {
         static NSString *CellIdentifier = @"SLEntityTableViewCellUITableViewCellStyleValue1";
-        
+
         SLEntityTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
         if (cell == nil) {
             cell = [[SLEntityTableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
         }
-        
+
         cell.textLabel.text = self.propertyMapping[attributeDescription.name];
         cell.detailTextLabel.text = [self stringValueForAttribute:attributeDescription.name];
-        
+
         NSArray *enumOptions = [self enumOptionsForAttribute:attributeDescription.name];
         if (enumOptions.count > 1) {
             cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
@@ -726,45 +735,45 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
             cell.accessoryType = UITableViewCellAccessoryNone;
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
         }
-        
+
         return cell;
     }
-    
+
     if (attributeDescription.attributeType == NSBooleanAttributeType) {
         static NSString *CellIdentifier = @"SLEntitySwitchCell";
-        
+
         SLEntitySwitchCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
         if (cell == nil) {
             cell = [[SLEntitySwitchCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
-            
+
             [cell.switchControl addTarget:self action:@selector(_switchValueChanged:) forControlEvents:UIControlEventValueChanged];
         }
-        
+
         cell.textLabel.text = self.propertyMapping[attributeDescription.name];
         cell.switchControl.on = [[self.entity valueForKey:attributeDescription.name] boolValue];
         objc_setAssociatedObject(cell.switchControl, &SLEntityViewControllerAttributeDescriptionKey,
                                  attributeDescription, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
-        
+
         return cell;
     }
-    
+
     if (!canEditProperty) {
         static NSString *CellIdentifier = @"SLEntityTableViewCellNotEditable";
-        
+
         SLEntityTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
         if (cell == nil) {
             cell = [[SLEntityTableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
-            
+
             cell.selectionStyle = UITableViewCellSelectionStyleNone;
             cell.accessoryType = UITableViewCellAccessoryNone;
         }
-        
+
         cell.textLabel.text = self.propertyMapping[attributeDescription.name];
         cell.detailTextLabel.text = [self stringValueForAttribute:attributeDescription.name];
-        
+
         return cell;
     }
-    
+
     NSAssert(NO, @"attribute %@ is not supported by SLEntityViewController", attributeDescription);
     return nil;
 }
@@ -773,32 +782,32 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 {
     NSString *firstLetter = [relationshipDescription.name substringToIndex:1];
     NSString *restString = [relationshipDescription.name substringFromIndex:1];
-    
+
     NSString *selectorName = [NSString stringWithFormat:@"tableView:cellFor%@%@AtIndexPath:", firstLetter.uppercaseString, restString];
     SEL selector = NSSelectorFromString(selectorName);
-    
+
     if ([self respondsToSelector:selector]) {
         return objc_msgSend(self, selector, tableView, indexPath);
     }
-    
+
     BOOL canEditProperty = [self canEditProperty:relationshipDescription.name];
-    
+
     static NSString *CellIdentifier = @"SLEntityTableViewCell";
-    
+
     SLEntityTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
         cell = [[SLEntityTableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
     }
-    
+
     cell.textLabel.text = self.propertyMapping[relationshipDescription.name];
-    
+
     if (relationshipDescription.isToMany) {
         cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"%d selected", @""), [[self.entity valueForKey:relationshipDescription.name] count]];
     } else {
         NSString *nameKeyPath = [self nameKeyPathForRelationship:relationshipDescription.name];
         cell.detailTextLabel.text = [[self.entity valueForKey:relationshipDescription.name] valueForKey:nameKeyPath];
     }
-    
+
     if (canEditProperty) {
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
         cell.selectionStyle = UITableViewCellSelectionStyleBlue;
@@ -806,7 +815,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         cell.accessoryType = UITableViewCellAccessoryNone;
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
     }
-    
+
     return cell;
 }
 
@@ -820,13 +829,13 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (UIKeyboardType)keyboardTypeForAttribute:(NSString *)attribute
 {
     NSNumber *registeredKeyboardType = self.keyboardTypes[attribute];
-    
+
     if (registeredKeyboardType) {
         return registeredKeyboardType.integerValue;
     }
-    
+
     NSAttributeDescription *attributeDescription = self.propertyDescriptions[attribute];
-    
+
     switch (attributeDescription.attributeType) {
         case NSStringAttributeType:
             return UIKeyboardTypeAlphabet;
@@ -844,14 +853,14 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         default:
             break;
     }
-    
+
     return UIKeyboardTypeAlphabet;
 }
 
 - (void)applyStringValue:(NSString *)value forAttribute:(NSString *)attribute
 {
     NSAttributeDescription *attributeDescription = self.propertyDescriptions[attribute];
-    
+
     switch (attributeDescription.attributeType) {
         case NSStringAttributeType:
             [self.entity setValue:value forKey:attribute];
@@ -880,22 +889,22 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         default:
             break;
     }
-    
+
     [self _updateVisibleSectionsAnimated:YES];
 }
 
 - (NSString *)stringValueForAttribute:(NSString *)attribute
 {
     NSAttributeDescription *attributeDescription = self.propertyDescriptions[attribute];
-    
+
     NSArray *enumOptions = [self enumOptionsForAttribute:attribute];
     NSArray *enumValues = [self enumValuesForAttribute:attribute];
-    
+
     if (enumOptions && enumValues) {
         NSDictionary *mapping = self.enumOptionsValueMappings[attributeDescription.name];
         return mapping[[self.entity valueForKey:attributeDescription.name]];
     }
-    
+
     switch (attributeDescription.attributeType) {
         case NSStringAttributeType:
             return [self.entity valueForKey:attribute];
@@ -910,7 +919,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
             if (!number) {
                 return @"";
             }
-            
+
             return [NSString stringWithFormat:@"%@", number];
             break;
         } case NSDateAttributeType:
@@ -921,41 +930,41 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         default:
             break;
     }
-    
+
     return [NSString stringWithFormat:@"%@", [self.entity valueForKey:attribute]];
 }
 
 - (void)configureTextFieldCell:(SLEntityTextFieldCell *)textFieldCell forAttribute:(NSString *)attribute
 {
-    
+
 }
 
 - (void)setViewControllerClass:(Class)viewControllerClass forAttribute:(NSString *)attribute
 {
     NSParameterAssert(viewControllerClass);
     NSAssert(class_conformsToProtocol(viewControllerClass, @protocol(SLSelectEntityAttributeViewControllerProtocol)), @"%@ does not conform to SLSelectEntityAttributeViewControllerProtocol", viewControllerClass);
-    
+
     self.viewControllerClasses[attribute] = NSStringFromClass(viewControllerClass);
 }
 
 - (Class)viewControllerClassForAttribute:(NSString *)attribute
 {
     NSString *className = self.viewControllerClasses[attribute];
-    
+
     if (!className) {
         return Nil;
     }
-    
+
     return NSClassFromString(className);
 }
 
 - (void)setEnumValues:(NSArray *)enumValues withOptions:(NSArray *)options forAttribute:(NSString *)attribute
 {
     NSAssert(enumValues.count == options.count, @"enumValues and options must have ");
-    
+
     self.enumValues[attribute] = enumValues;
     self.enumOptions[attribute] = options;
-    
+
     self.enumOptionsValueMappings[attribute] = [NSDictionary dictionaryWithObjects:options forKeys:enumValues];
 }
 
@@ -972,7 +981,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (void)onlyShowAttribute:(NSString *)attribute whenPredicateEvaluates:(NSPredicate *)predicate
 {
     NSAssert([self _propertiesContainAttribute:attribute], @"%@ not included in configured properties: %@", attribute, self.properties);
-    
+
     self.predicates[attribute] = predicate;
     [self _updateVisibleSectionsAnimated:NO];
 }
@@ -985,7 +994,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (void)setFetchedResultsController:(NSFetchedResultsController *)fetchedResultsController forRelationship:(NSString *)relationship
 {
     NSAssert([self _propertiesContainAttribute:relationship], @"%@ not included in configured properties: %@", relationship, self.properties);
-    
+
     self.fetchedResultsControllers[relationship] = fetchedResultsController;
 }
 
@@ -997,7 +1006,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (void)setNameKeyPath:(NSString *)nameKeyPath forRelationship:(NSString *)relationship
 {
     NSAssert([self _propertiesContainAttribute:relationship], @"%@ not included in configured properties: %@", relationship, self.properties);
-    
+
     self.relationshipNameKeyPaths[relationship] = nameKeyPath;
 }
 
@@ -1009,27 +1018,27 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (void)cancelButtonClicked:(UIBarButtonItem *)sender
 {
     [[UIApplication sharedApplication] sendAction:@selector(resignFirstResponder) to:nil from:nil forEvent:nil];
-    
+
     if (self.editingType == SLEntityViewControllerEditingTypeCreate) {
         NSManagedObject *entity = self.entity;
-        
+
         [entity.managedObjectContext deleteObject:entity];
-        
+
         NSError *saveError = nil;
         [entity.managedObjectContext save:&saveError];
         NSAssert(saveError == nil, @"error saving NSManagedObjectContext: %@", saveError);
     } else {
         NSManagedObject *entity = self.entity;
-        
+
         NSArray *changedKeys = entity.changedValues.allKeys;
         NSDictionary *commitedValues = [entity committedValuesForKeys:changedKeys];
-        
+
         for (NSString *key in commitedValues) {
             id value = commitedValues[key];
             [entity setValue:[value isEqual:[NSNull null]] ? nil : value forKey:key];
         }
     }
-    
+
     if (self.completionHandler) {
         self.completionHandler(NO);
         self.completionHandler = NULL;
@@ -1039,23 +1048,23 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (void)saveButtonClicked:(UIBarButtonItem *)sender
 {
     [[UIApplication sharedApplication] sendAction:@selector(resignFirstResponder) to:nil from:nil forEvent:nil];
-    
+
     UIBarButtonItem *previousBarButtonItem = self.navigationItem.rightBarButtonItem;
     self.navigationItem.rightBarButtonItem = self.activityIndicatorBarButtonItem;
     self.navigationItem.leftBarButtonItem.enabled = NO;
     self.view.userInteractionEnabled = NO;
-    
+
     void(^cleanupUI)(void) = ^{
         self.navigationItem.rightBarButtonItem = previousBarButtonItem;
         self.navigationItem.leftBarButtonItem.enabled = YES;
         self.view.userInteractionEnabled = YES;
-        
+
         [[UIApplication sharedApplication] sendAction:@selector(resignFirstResponder) to:nil from:nil forEvent:nil];
     };
-    
+
     void(^completionHandler)(id managedObject, NSError *error) = ^(id managedObject, NSError *error) {
         cleanupUI();
-        
+
         if (error) {
             UIAlertView *alert = [[UIAlertView alloc] initWithTitle:error.localizedDescription
                                                             message:error.localizedFailureReason
@@ -1065,13 +1074,13 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
             [alert show];
             return;
         }
-        
+
         if (self.completionHandler) {
             self.completionHandler(YES);
             self.completionHandler = NULL;
         }
     };
-    
+
     if (self.editingType == SLEntityViewControllerEditingTypeCreate) {
         [self.entity createWithCompletionHandler:completionHandler];
     } else {
@@ -1091,13 +1100,13 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (void)encodeRestorableStateWithCoder:(NSCoder *)coder
 {
     [super encodeRestorableStateWithCoder:coder];
-    
+
 }
 
 - (void)decodeRestorableStateWithCoder:(NSCoder *)coder
 {
     [super decodeRestorableStateWithCoder:coder];
-    
+
 }
 
 #pragma mark - UIDataSourceModelAssociation
@@ -1105,18 +1114,18 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (NSString *)modelIdentifierForElementAtIndexPath:(NSIndexPath *)indexPath inView:(UIView *)view
 {
     if (indexPath) {
-        
+
     }
-    
+
     return nil;
 }
 
 - (NSIndexPath *)indexPathForElementWithModelIdentifier:(NSString *)identifier inView:(UIView *)view
 {
     if (identifier) {
-        
+
     }
-    
+
     return nil;
 }
 
@@ -1125,10 +1134,10 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (void)selectEnumAttributeViewController:(SLSelectEnumAttributeViewController *)viewController didSelectEnumValue:(id)enumValue
 {
     NSAttributeDescription *attributeDescription = objc_getAssociatedObject(viewController, &SLEntityViewControllerAttributeDescriptionKey);
-    
+
     [self.entity setValue:enumValue forKey:attributeDescription.name];
     [self _updateVisibleSectionsAnimated:NO];
-    
+
     [self.navigationController popToViewController:self animated:YES];
 }
 
@@ -1137,14 +1146,14 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (void)_textFieldEditingChanged:(UITextField *)sender
 {
     NSAttributeDescription *attributeDescription = objc_getAssociatedObject(sender, &SLEntityViewControllerAttributeDescriptionKey);
-    
+
     [self applyStringValue:sender.text forAttribute:attributeDescription.name];
 }
 
 - (void)_switchValueChanged:(UISwitch *)sender
 {
     NSAttributeDescription *attributeDescription = objc_getAssociatedObject(sender, &SLEntityViewControllerAttributeDescriptionKey);
-    
+
     [self.entity setValue:@(sender.isOn) forKey:attributeDescription.name];
     [self _updateVisibleSectionsAnimated:YES];
 }
@@ -1152,24 +1161,24 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (void)_updateVisibleSectionsAnimated:(BOOL)animated
 {
     NSMutableArray *visibleSections = [NSMutableArray arrayWithCapacity:self.sections.count];
-    
+
     for (_SLEntityViewControllerSectionInfo *sectionInfo in self.sections) {
         _SLEntityViewControllerSectionInfo *visibleSectionInfo = [[_SLEntityViewControllerSectionInfo alloc] init];
         visibleSectionInfo.titleText = sectionInfo.titleText;
         visibleSectionInfo.footerText = sectionInfo.footerText;
-        
+
         NSMutableArray *properties = [NSMutableArray arrayWithCapacity:sectionInfo.properties.count];
-        
+
         for (NSString *property in sectionInfo.properties) {
             if ([[self predicateForAttribute:property] evaluateWithObject:self.entity]) {
                 [properties addObject:property];
             }
         }
-        
+
         visibleSectionInfo.properties = [properties copy];
         [visibleSections addObject:visibleSectionInfo];
     }
-    
+
     [self setVisibleSections:visibleSections animateDiff:animated];
 }
 
@@ -1177,7 +1186,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 {
     NSArray *enumOptions = [self enumOptionsForAttribute:attributeDescription.name];
     NSArray *enumValues = [self enumValuesForAttribute:attributeDescription.name];
-    
+
     return enumOptions != nil && enumValues != nil && [self canEditProperty:attributeDescription.name];
 }
 
@@ -1196,7 +1205,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
                                 @(NSDateAttributeType)
                                 ];
     }
-    
+
     return [textFieldAttributes containsObject:@(attributeDescription.attributeType)] && ![self _attributeDescriptionRequiresEnum:attributeDescription] && [self canEditProperty:attributeDescription.name];
 }
 
@@ -1206,14 +1215,14 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         [self.tableView reloadData];
         return;
     }
-    
+
     [self.tableView beginUpdates];
-    
+
     __block NSInteger previousVisibleSectionIndex = 0;
-    
+
     [visibleSections enumerateObjectsUsingBlock:^(_SLEntityViewControllerSectionInfo *visibleSection, NSUInteger idx, BOOL *stop) {
         _SLEntityViewControllerSectionInfo *previousVisibleSection = previousVisibleSections[idx];
-        
+
         if (visibleSection.isVisible && !previousVisibleSection.isVisible) {
             [self.tableView insertSections:[NSIndexSet indexSetWithIndex:previousVisibleSectionIndex] withRowAnimation:UITableViewRowAnimationTop];
         } else if (!visibleSection.isVisible && previousVisibleSection.isVisible) {
@@ -1221,50 +1230,50 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         } else if (visibleSection.isVisible && previousVisibleSection.isVisible) {
             NSArray *previousVisibleProperties = previousVisibleSection.properties;
             NSArray *visibleProperties = visibleSection.properties;
-            
+
             NSMutableArray *deletedIndexPaths = [NSMutableArray arrayWithCapacity:previousVisibleProperties.count];
             NSMutableArray *insertedIndexPaths = [NSMutableArray arrayWithCapacity:visibleProperties.count];
-            
+
             for (NSString *property in previousVisibleProperties) {
                 if ([visibleProperties containsObject:property]) {
                     continue;
                 }
-                
+
                 [deletedIndexPaths addObject:[NSIndexPath indexPathForRow:[previousVisibleProperties indexOfObject:property]
                                                                 inSection:previousVisibleSectionIndex]];
             }
-            
+
             for (NSString *property in visibleProperties) {
                 if ([previousVisibleProperties containsObject:property]) {
                     continue;
                 }
-                
+
                 [insertedIndexPaths addObject:[NSIndexPath indexPathForRow:[visibleProperties indexOfObject:property]
                                                                  inSection:previousVisibleSectionIndex]];
             }
-            
+
             [self.tableView deleteRowsAtIndexPaths:deletedIndexPaths withRowAnimation:UITableViewRowAnimationTop];
             [self.tableView insertRowsAtIndexPaths:insertedIndexPaths withRowAnimation:UITableViewRowAnimationTop];
         }
-        
+
         if (previousVisibleSection.isVisible) {
             previousVisibleSectionIndex++;
         }
     }];
-    
+
     [self.tableView endUpdates];
 }
 
 - (NSInteger)_numberOfSections
 {
     NSInteger sectionCount = 0;
-    
+
     for (_SLEntityViewControllerSectionInfo *section in self.visibleSections) {
         if (section.isVisible) {
             sectionCount++;
         }
     }
-    
+
     return sectionCount;
 }
 
@@ -1276,17 +1285,17 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (_SLEntityViewControllerSectionInfo *)_sectionAtIndex:(NSInteger)section
 {
     NSInteger currentIndex = -1;
-    
+
     for (_SLEntityViewControllerSectionInfo *sectionInfo in self.visibleSections) {
         if (sectionInfo.isVisible) {
             currentIndex++;
         }
-        
+
         if (currentIndex == section) {
             return sectionInfo;
         }
     }
-    
+
     NSAssert(NO, @"This line should never be executed.");
     return nil;
 }
@@ -1303,7 +1312,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
             return YES;
         }
     }
-    
+
     return NO;
 }
 
