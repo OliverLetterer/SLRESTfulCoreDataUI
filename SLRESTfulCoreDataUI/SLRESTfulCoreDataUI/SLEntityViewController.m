@@ -665,6 +665,20 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     return [self _propertiesInSection:indexPath.section][indexPath.row];
 }
 
+- (NSIndexPath *)indexPathForProperty:(NSString *)property
+{
+    __block NSIndexPath *indexPath = nil;
+
+    [self.visibleSections enumerateObjectsUsingBlock:^(_SLEntityViewControllerSectionInfo *sectionInfo, NSUInteger idx, BOOL *stop) {
+        if ([sectionInfo.properties containsObject:property]) {
+            indexPath = [NSIndexPath indexPathForRow:[sectionInfo.properties indexOfObject:property] inSection:idx];
+            *stop = YES;
+        }
+    }];
+
+    return indexPath;
+}
+
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForAttributeDescription:(NSAttributeDescription *)attributeDescription atIndexPath:(NSIndexPath *)indexPath
 {
     NSString *firstLetter = [attributeDescription.name substringToIndex:1];
@@ -1255,25 +1269,25 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
             [self.tableView deleteRowsAtIndexPaths:deletedIndexPaths withRowAnimation:UITableViewRowAnimationTop];
             [self.tableView insertRowsAtIndexPaths:insertedIndexPaths withRowAnimation:UITableViewRowAnimationTop];
         }
-
+        
         if (previousVisibleSection.isVisible) {
             previousVisibleSectionIndex++;
         }
     }];
-
+    
     [self.tableView endUpdates];
 }
 
 - (NSInteger)_numberOfSections
 {
     NSInteger sectionCount = 0;
-
+    
     for (_SLEntityViewControllerSectionInfo *section in self.visibleSections) {
         if (section.isVisible) {
             sectionCount++;
         }
     }
-
+    
     return sectionCount;
 }
 
@@ -1285,17 +1299,17 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (_SLEntityViewControllerSectionInfo *)_sectionAtIndex:(NSInteger)section
 {
     NSInteger currentIndex = -1;
-
+    
     for (_SLEntityViewControllerSectionInfo *sectionInfo in self.visibleSections) {
         if (sectionInfo.isVisible) {
             currentIndex++;
         }
-
+        
         if (currentIndex == section) {
             return sectionInfo;
         }
     }
-
+    
     NSAssert(NO, @"This line should never be executed.");
     return nil;
 }
@@ -1312,7 +1326,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
             return YES;
         }
     }
-
+    
     return NO;
 }
 

@@ -101,6 +101,7 @@ typedef NS_ENUM(NSUInteger, SLEntityViewControllerEditingType) {
 - (NSString *)propertyNameForTextField:(UITextField *)textField;
 
 - (NSString *)propertyForIndexPath:(NSIndexPath *)indexPath;
+- (NSIndexPath *)indexPathForProperty:(NSString *)property;
 
 /**
  Configuring, if a property is editable or readonly.
