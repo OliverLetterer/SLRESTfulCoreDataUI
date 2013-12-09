@@ -1240,7 +1240,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         if (visibleSection.isVisible && !previousVisibleSection.isVisible) {
             [self.tableView insertSections:[NSIndexSet indexSetWithIndex:previousVisibleSectionIndex] withRowAnimation:UITableViewRowAnimationTop];
         } else if (!visibleSection.isVisible && previousVisibleSection.isVisible) {
-            [self.tableView insertSections:[NSIndexSet indexSetWithIndex:previousVisibleSectionIndex] withRowAnimation:UITableViewRowAnimationTop];
+            [self.tableView deleteSections:[NSIndexSet indexSetWithIndex:previousVisibleSectionIndex] withRowAnimation:UITableViewRowAnimationTop];
         } else if (visibleSection.isVisible && previousVisibleSection.isVisible) {
             NSArray *previousVisibleProperties = previousVisibleSection.properties;
             NSArray *visibleProperties = visibleSection.properties;
