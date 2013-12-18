@@ -290,6 +290,13 @@ static NSString *capitalizedString(NSString *string)
     return nil;
 }
 
+#pragma mark - NSFetchedResultsControllerDelegate
+
+- (void)controllerDidChangeContent:(NSFetchedResultsController *)controller
+{
+    [self.tableView reloadData];
+}
+
 #pragma mark - Private category implementation ()
 
 @end
