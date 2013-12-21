@@ -36,6 +36,18 @@ typedef NS_ENUM(NSUInteger, SLEntityViewControllerEditingType) {
 
 
 
+@interface SLEntityViewControllerSection : NSObject
+
++ (instancetype)staticSectionWithProperties:(NSArray *)properties;
+@property (nonatomic, readonly) NSArray *properties;
+
+@property (nonatomic, copy) NSString *titleText;
+@property (nonatomic, copy) NSString *footerText;
+
+@end
+
+
+
 /**
  @abstract  <#abstract comment#>
  */
@@ -52,7 +64,7 @@ typedef NS_ENUM(NSUInteger, SLEntityViewControllerEditingType) {
  value: string which will be displayed to the user for this property
  */
 @property (nonatomic, strong) NSDictionary *propertyMapping;
-@property (nonatomic, strong) NSArray *properties;
+@property (nonatomic, copy) NSArray *sections;
 
 /**
  managing keyboard types for attributes

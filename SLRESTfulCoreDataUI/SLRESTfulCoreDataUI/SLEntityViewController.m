@@ -36,46 +36,60 @@
 
 char *const SLEntityViewControllerAttributeDescriptionKey;
 
-@interface _SLEntityViewControllerSectionInfo : NSObject
-
-@property (nonatomic, copy) NSString *titleText;
-@property (nonatomic, strong) NSArray *properties;
-@property (nonatomic, copy) NSString *footerText;
+@interface SLEntityViewControllerSection ()
 
 @property (nonatomic, readonly) BOOL isVisible;
+@property (nonatomic, strong) NSArray *properties;
 
 @end
 
-@implementation _SLEntityViewControllerSectionInfo
+@implementation SLEntityViewControllerSection
+
+#pragma mark - setters and getters
 
 - (BOOL)isVisible
 {
     return self.properties.count > 0;
 }
 
-- (BOOL)isEqual:(id)object
-{
-    if (object == self) {
-        return YES;
-    }
-    if (!object || ![object isKindOfClass:[self class]]) {
-        return NO;
-    }
-    return [self isEqualToSection:object];
+#pragma mark - Initialization
 
++ (instancetype)staticSectionWithProperties:(NSArray *)properties
+{
+    SLEntityViewControllerSection *section = [[SLEntityViewControllerSection alloc] init];
+    section.properties = properties;
+
+    return section;
 }
 
-- (BOOL)isEqualToSection:(_SLEntityViewControllerSectionInfo *)object
+- (BOOL)isEqual:(id)object
 {
     if (self == object) {
         return YES;
     }
+
+    if (!object || ![object isKindOfClass:[self class]]) {
+        return NO;
+    }
+
+    return [self isEqualToSection:object];
+
+}
+
+- (BOOL)isEqualToSection:(SLEntityViewControllerSection *)object
+{
+    if (self == object) {
+        return YES;
+    }
+
     if (![self.titleText isEqual:object.titleText] && self.titleText != object.titleText) {
         return NO;
     }
+
     if (![self.footerText isEqual:object.footerText] && self.footerText != object.footerText) {
         return NO;
     }
+
     if (![self.properties isEqual:object.properties] && self.properties != object.properties) {
         return NO;
     }
@@ -114,9 +128,8 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 @property (nonatomic, strong) NSMutableDictionary *predicates;
 
 @property (nonatomic, strong) NSEntityDescription *entityDescription;
-@property (nonatomic, strong) NSDictionary *propertyDescriptions;
 
-@property (nonatomic, strong) NSArray *sections;
+//@property (nonatomic, strong) NSArray *sections;
 @property (nonatomic, readonly) NSArray *visibleSections;
 - (void)setVisibleSections:(NSArray *)sections animateDiff:(BOOL)animateDiff;
 
@@ -222,106 +235,11 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     return _predicates;
 }
 
-- (void)setProperties:(NSArray *)properties
-{
-    if (properties != _properties) {
-        _properties = properties;
-
-        NSMutableDictionary *propertyDescriptions = [NSMutableDictionary dictionaryWithCapacity:_properties.count];
-
-        if (_properties.count > 0) {
-            id firstObject = _properties[0];
-
-            if ([firstObject isKindOfClass:[NSString class]]) {
-                for (NSString *propertyName in _properties) {
-                    NSPropertyDescription *propertyDescription = self.entityDescription.propertiesByName[propertyName];
-                    NSAssert(propertyDescription != nil, @"propertyDescription for key %@ cannot be nil", propertyName);
-
-                    propertyDescriptions[propertyName] = propertyDescription;
-                }
-
-                _SLEntityViewControllerSectionInfo *section = [[_SLEntityViewControllerSectionInfo alloc] init];
-                section.properties = _properties;
-
-                self.sections = @[ section ];
-            } else {
-                NSMutableArray *sections = [NSMutableArray arrayWithCapacity:_properties.count];
-
-                for (NSArray *sectionArray in _properties) {
-                    NSAssert(sectionArray.count > 0, @"section %@ of sections %@ cannot contain zero objects", sectionArray, _properties);
-
-                    BOOL sectionArrayContainsHeaderOrFooterText = NO;
-                    for (id object in sectionArray) {
-                        if ([object isKindOfClass:[NSArray class]]) {
-                            sectionArrayContainsHeaderOrFooterText = YES;
-                            break;
-                        }
-                    }
-
-                    _SLEntityViewControllerSectionInfo *sectionInfo = [[_SLEntityViewControllerSectionInfo alloc] init];
-
-                    if (!sectionArrayContainsHeaderOrFooterText) {
-                        sectionInfo.properties = sectionArray;
-
-                        for (NSString *propertyName in sectionArray) {
-                            NSPropertyDescription *propertyDescription = self.entityDescription.propertiesByName[propertyName];
-                            NSAssert(propertyDescription != nil, @"propertyDescription for key %@ cannot be nil", propertyName);
-
-                            propertyDescriptions[propertyName] = propertyDescription;
-                        }
-                    } else {
-                        [sectionArray enumerateObjectsUsingBlock:^(id object, NSUInteger idx, BOOL *stop) {
-                            if ([object isKindOfClass:[NSString class]]) {
-                                if (idx == 0) {
-                                    sectionInfo.titleText = object;
-                                } else {
-                                    sectionInfo.footerText = object;
-                                }
-                            } else if ([object isKindOfClass:[NSArray class]]) {
-                                sectionInfo.properties = object;
-
-                                for (NSString *propertyName in object) {
-                                    NSPropertyDescription *propertyDescription = self.entityDescription.propertiesByName[propertyName];
-                                    NSAssert(propertyDescription != nil, @"propertyDescription for key %@ cannot be nil", propertyName);
-
-                                    propertyDescriptions[propertyName] = propertyDescription;
-                                }
-                            }
-                        }];
-                    }
-
-                    [sections addObject:sectionInfo];
-                }
-
-                self.sections = [sections copy];
-            }
-        }
-
-        self.propertyDescriptions = propertyDescriptions;
-    }
-}
-
-- (void)setPropertyMapping:(NSDictionary *)propertyMapping
-{
-    if (propertyMapping != _propertyMapping) {
-        _propertyMapping = propertyMapping;
-
-        self.properties = [_propertyMapping.allKeys sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
-            NSString *value1 = _propertyMapping[obj1];
-            NSString *value2 = _propertyMapping[obj2];
-
-            return [value1 caseInsensitiveCompare:value2];
-        }];
-    }
-}
-
 - (void)setSections:(NSArray *)sections
 {
-    if (sections != _sections) {
-        _sections = sections;
+    _sections = [sections copy];
 
-        [self _updateVisibleSectionsAnimated:NO];
-    }
+    [self _updateVisibleSectionsAnimated:NO];
 }
 
 - (void)setVisibleSections:(NSArray *)sections animateDiff:(BOOL)animateDiff
@@ -354,7 +272,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
                                              inManagedObjectContext:entity.managedObjectContext];
         NSParameterAssert(self.entityDescription);
 
-        self.properties = @[];
+        self.sections = @[];
         self.title = _editingType == SLEntityViewControllerEditingTypeCreate ? NSLocalizedString(@"Create", @"") : NSLocalizedString(@"Edit", @"");
 
 #if __IPHONE_OS_VERSION_MIN_REQUIRED >= __IPHONE_7_0
@@ -418,22 +336,32 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 {
     [super viewDidAppear:animated];
 
-    for (NSString *property in self.properties) {
-        NSAttributeDescription *attributeDescription = self.propertyDescriptions[property];
-
-        if (![attributeDescription isKindOfClass:[NSAttributeDescription class]]) {
+    for (SLEntityViewControllerSection *section in self.sections) {
+        if (!section.properties) {
             continue;
         }
 
-        if (![self _attributeDescriptionRequiresTextField:attributeDescription] || [self stringValueForAttribute:property].length > 0) {
-            continue;
-        }
+        for (NSString *property in section.properties) {
+            NSAttributeDescription *attributeDescription = self.entityDescription.propertiesByName[property];
 
-        NSInteger index = [self.properties indexOfObject:property];
-        SLEntityTextFieldCell *cell = (SLEntityTextFieldCell *)[self.tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:index inSection:0]];
-        if ([cell isKindOfClass:[SLEntityTextFieldCell class]]) {
-            [cell.textField becomeFirstResponder];
-            return;
+            if (![attributeDescription isKindOfClass:[NSAttributeDescription class]]) {
+                continue;
+            }
+
+            if (![self _attributeDescriptionRequiresTextField:attributeDescription] || [self stringValueForAttribute:property].length > 0) {
+                continue;
+            }
+
+            NSIndexPath *indexPath = [self indexPathForProperty:attributeDescription.name];
+            if (!indexPath) {
+                continue;
+            }
+
+            SLEntityTextFieldCell *cell = (SLEntityTextFieldCell *)[self.tableView cellForRowAtIndexPath:indexPath];
+            if ([cell isKindOfClass:[SLEntityTextFieldCell class]]) {
+                [cell.textField becomeFirstResponder];
+                return;
+            }
         }
     }
 }
@@ -485,7 +413,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSString *property = [self _propertiesInSection:indexPath.section][indexPath.row];
-    id propertyDescription = self.propertyDescriptions[property];
+    id propertyDescription = self.entityDescription.propertiesByName[property];
 
     if ([propertyDescription isKindOfClass:[NSAttributeDescription class]]) {
         return [self tableView:tableView cellForAttributeDescription:propertyDescription atIndexPath:indexPath];
@@ -531,13 +459,13 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    _SLEntityViewControllerSectionInfo *sectionInfo = [self _sectionAtIndex:section];
+    SLEntityViewControllerSection *sectionInfo = [self _sectionAtIndex:section];
     return sectionInfo.titleText;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
 {
-    _SLEntityViewControllerSectionInfo *sectionInfo = [self _sectionAtIndex:section];
+    SLEntityViewControllerSection *sectionInfo = [self _sectionAtIndex:section];
     return sectionInfo.footerText;
 }
 
@@ -546,7 +474,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     NSString *property = [self propertyForIndexPath:indexPath];
-    id propertyDescription = self.propertyDescriptions[property];
+    id propertyDescription = self.entityDescription.propertiesByName[property];
 
     if (![self canEditProperty:[propertyDescription name]]) {
         [tableView deselectRowAtIndexPath:indexPath animated:NO];
@@ -669,9 +597,9 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 {
     __block NSIndexPath *indexPath = nil;
 
-    [self.visibleSections enumerateObjectsUsingBlock:^(_SLEntityViewControllerSectionInfo *sectionInfo, NSUInteger idx, BOOL *stop) {
-        if ([sectionInfo.properties containsObject:property]) {
-            indexPath = [NSIndexPath indexPathForRow:[sectionInfo.properties indexOfObject:property] inSection:idx];
+    [self.visibleSections enumerateObjectsUsingBlock:^(SLEntityViewControllerSection *section, NSUInteger idx, BOOL *stop) {
+        if ([section.properties containsObject:property]) {
+            indexPath = [NSIndexPath indexPathForRow:[section.properties indexOfObject:property] inSection:idx];
             *stop = YES;
         }
     }];
@@ -848,7 +776,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         return registeredKeyboardType.integerValue;
     }
 
-    NSAttributeDescription *attributeDescription = self.propertyDescriptions[attribute];
+    NSAttributeDescription *attributeDescription = self.entityDescription.attributesByName[attribute];
 
     switch (attributeDescription.attributeType) {
         case NSStringAttributeType:
@@ -873,7 +801,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (void)applyStringValue:(NSString *)value forAttribute:(NSString *)attribute
 {
-    NSAttributeDescription *attributeDescription = self.propertyDescriptions[attribute];
+    NSAttributeDescription *attributeDescription = self.entityDescription.attributesByName[attribute];
 
     switch (attributeDescription.attributeType) {
         case NSStringAttributeType:
@@ -909,7 +837,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (NSString *)stringValueForAttribute:(NSString *)attribute
 {
-    NSAttributeDescription *attributeDescription = self.propertyDescriptions[attribute];
+    NSAttributeDescription *attributeDescription = self.entityDescription.attributesByName[attribute];
 
     NSArray *enumOptions = [self enumOptionsForAttribute:attribute];
     NSArray *enumValues = [self enumValuesForAttribute:attribute];
@@ -994,8 +922,6 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (void)onlyShowAttribute:(NSString *)attribute whenPredicateEvaluates:(NSPredicate *)predicate
 {
-    NSAssert([self _propertiesContainAttribute:attribute], @"%@ not included in configured properties: %@", attribute, self.properties);
-
     self.predicates[attribute] = predicate;
     [self _updateVisibleSectionsAnimated:NO];
 }
@@ -1007,8 +933,6 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (void)setFetchedResultsController:(NSFetchedResultsController *)fetchedResultsController forRelationship:(NSString *)relationship
 {
-    NSAssert([self _propertiesContainAttribute:relationship], @"%@ not included in configured properties: %@", relationship, self.properties);
-
     self.fetchedResultsControllers[relationship] = fetchedResultsController;
 }
 
@@ -1019,8 +943,6 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (void)setNameKeyPath:(NSString *)nameKeyPath forRelationship:(NSString *)relationship
 {
-    NSAssert([self _propertiesContainAttribute:relationship], @"%@ not included in configured properties: %@", relationship, self.properties);
-
     self.relationshipNameKeyPaths[relationship] = nameKeyPath;
 }
 
@@ -1176,8 +1098,8 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 {
     NSMutableArray *visibleSections = [NSMutableArray arrayWithCapacity:self.sections.count];
 
-    for (_SLEntityViewControllerSectionInfo *sectionInfo in self.sections) {
-        _SLEntityViewControllerSectionInfo *visibleSectionInfo = [[_SLEntityViewControllerSectionInfo alloc] init];
+    for (SLEntityViewControllerSection *sectionInfo in self.sections) {
+        SLEntityViewControllerSection *visibleSectionInfo = [[SLEntityViewControllerSection alloc] init];
         visibleSectionInfo.titleText = sectionInfo.titleText;
         visibleSectionInfo.footerText = sectionInfo.footerText;
 
@@ -1234,8 +1156,8 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
     __block NSInteger previousVisibleSectionIndex = 0;
 
-    [visibleSections enumerateObjectsUsingBlock:^(_SLEntityViewControllerSectionInfo *visibleSection, NSUInteger idx, BOOL *stop) {
-        _SLEntityViewControllerSectionInfo *previousVisibleSection = previousVisibleSections[idx];
+    [visibleSections enumerateObjectsUsingBlock:^(SLEntityViewControllerSection *visibleSection, NSUInteger idx, BOOL *stop) {
+        SLEntityViewControllerSection *previousVisibleSection = previousVisibleSections[idx];
 
         if (visibleSection.isVisible && !previousVisibleSection.isVisible) {
             [self.tableView insertSections:[NSIndexSet indexSetWithIndex:previousVisibleSectionIndex] withRowAnimation:UITableViewRowAnimationTop];
@@ -1269,20 +1191,20 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
             [self.tableView deleteRowsAtIndexPaths:deletedIndexPaths withRowAnimation:UITableViewRowAnimationTop];
             [self.tableView insertRowsAtIndexPaths:insertedIndexPaths withRowAnimation:UITableViewRowAnimationTop];
         }
-        
+
         if (previousVisibleSection.isVisible) {
             previousVisibleSectionIndex++;
         }
     }];
-    
+
     [self.tableView endUpdates];
 }
 
 - (NSInteger)_numberOfSections
 {
     NSInteger sectionCount = 0;
-    
-    for (_SLEntityViewControllerSectionInfo *section in self.visibleSections) {
+
+    for (SLEntityViewControllerSection *section in self.visibleSections) {
         if (section.isVisible) {
             sectionCount++;
         }
@@ -1296,11 +1218,11 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     return [self _propertiesInSection:section].count;
 }
 
-- (_SLEntityViewControllerSectionInfo *)_sectionAtIndex:(NSInteger)section
+- (SLEntityViewControllerSection *)_sectionAtIndex:(NSInteger)section
 {
     NSInteger currentIndex = -1;
     
-    for (_SLEntityViewControllerSectionInfo *sectionInfo in self.visibleSections) {
+    for (SLEntityViewControllerSection *sectionInfo in self.visibleSections) {
         if (sectionInfo.isVisible) {
             currentIndex++;
         }
@@ -1321,7 +1243,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (BOOL)_propertiesContainAttribute:(NSString *)attribute
 {
-    for (_SLEntityViewControllerSectionInfo *sectionInfo in self.sections) {
+    for (SLEntityViewControllerSection *sectionInfo in self.sections) {
         if ([sectionInfo.properties containsObject:attribute]) {
             return YES;
         }
