@@ -38,11 +38,14 @@ typedef NS_ENUM(NSUInteger, SLEntityViewControllerEditingType) {
 
 @interface SLEntityViewControllerSection : NSObject
 
-+ (instancetype)staticSectionWithProperties:(NSArray *)properties;
-@property (nonatomic, readonly) NSArray *properties;
-
 @property (nonatomic, copy) NSString *titleText;
 @property (nonatomic, copy) NSString *footerText;
+
++ (instancetype)staticSectionWithProperties:(NSArray *)properties;
+
++ (instancetype)dynamicEntityWithRelationship:(NSString *)relationship
+                     fetchedResultsController:(NSFetchedResultsController *)fetchedResultsController
+                                  formatBlock:(NSString *(^)(id entity))formatBlock;
 
 @end
 
