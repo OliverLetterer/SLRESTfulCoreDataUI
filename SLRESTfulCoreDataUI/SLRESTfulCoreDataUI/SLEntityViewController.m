@@ -53,6 +53,12 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 @property (nonatomic, strong) NSArray *properties;
 @end
 
+@interface SLEntityViewControllerStaticEnumSection : SLEntityViewControllerSection
+@property (nonatomic, strong) NSString *attribute;
+@property (nonatomic, strong) NSArray *values;
+@property (nonatomic, strong) NSArray *humanReadableOptions;
+@end
+
 @interface SLEntityViewControllerDynamicSection : SLEntityViewControllerSection
 @property (nonatomic, copy) NSString *relationship;
 @property (nonatomic, strong) NSFetchedResultsController *fetchedResultsController;
@@ -80,6 +86,16 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     return section;
 }
 
++ (instancetype)staticSectionWithEnumValue:(NSArray *)values humanReadableOptions:(NSArray *)humanReadableOptions forAttribute:(NSString *)attribute
+{
+    SLEntityViewControllerStaticEnumSection *section = [[SLEntityViewControllerStaticEnumSection alloc] init];
+    section.attribute = attribute;
+    section.values = values;
+    section.humanReadableOptions = humanReadableOptions;
+
+    return section;
+}
+
 + (instancetype)dynamicEntityWithRelationship:(NSString *)relationship
                      fetchedResultsController:(NSFetchedResultsController *)fetchedResultsController
                                   formatBlock:(NSString *(^)(id entity))formatBlock
@@ -90,48 +106,6 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     section.formatBlock = formatBlock;
 
     return section;
-}
-
-#pragma mark - NSObject
-
-- (BOOL)isEqual:(id)object
-{
-    if (self == object) {
-        return YES;
-    }
-
-    if (!object || ![object isKindOfClass:[self class]]) {
-        return NO;
-    }
-
-    return [self isEqualToSection:object];
-}
-
-- (BOOL)isEqualToSection:(SLEntityViewControllerSection *)object
-{
-    if (self == object) {
-        return YES;
-    }
-
-    if (![self.titleText isEqual:object.titleText] && self.titleText != object.titleText) {
-        return NO;
-    }
-
-    if (![self.footerText isEqual:object.footerText] && self.footerText != object.footerText) {
-        return NO;
-    }
-
-    return YES;
-}
-
-- (NSUInteger)hash
-{
-    NSUInteger hash = 0;
-
-    hash += self.titleText.hash;
-    hash += self.footerText.hash;
-
-    return hash;
 }
 
 @end
@@ -145,31 +119,6 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     return self.properties.count > 0;
 }
 
-- (BOOL)isEqualToSection:(SLEntityViewControllerStaticSection *)object
-{
-    if (self == object) {
-        return YES;
-    }
-
-    if (![super isEqualToSection:object]) {
-        return NO;
-    }
-
-    if (![self.properties isEqual:object.properties] && self.properties != object.properties) {
-        return NO;
-    }
-
-    return YES;
-}
-
-- (NSUInteger)hash
-{
-    NSUInteger hash = [super hash];
-    hash += self.properties.hash;
-
-    return hash;
-}
-
 @end
 
 @implementation SLEntityViewControllerDynamicSection
@@ -179,34 +128,13 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     return YES;
 }
 
-- (BOOL)isEqualToSection:(SLEntityViewControllerDynamicSection *)object
+@end
+
+@implementation SLEntityViewControllerStaticEnumSection
+
+- (BOOL)isVisible
 {
-    if (self == object) {
-        return YES;
-    }
-
-    if (![super isEqualToSection:object]) {
-        return NO;
-    }
-
-    if (![self.relationship isEqual:object.relationship] && self.relationship != object.relationship) {
-        return NO;
-    }
-
-    if (![self.fetchedResultsController isEqual:object.fetchedResultsController] && self.fetchedResultsController != object.fetchedResultsController) {
-        return NO;
-    }
-
     return YES;
-}
-
-- (NSUInteger)hash
-{
-    NSUInteger hash = [super hash];
-    hash += self.relationship.hash;
-    hash += self.fetchedResultsController.hash;
-
-    return hash;
 }
 
 @end
@@ -554,8 +482,13 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         SLEntityViewControllerDynamicSection *dynamicSection = sectionInfo;
 
         return dynamicSection.fetchedResultsController.fetchedObjects.count;
+    } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerStaticEnumSection class]]) {
+        SLEntityViewControllerStaticEnumSection *staticSection = sectionInfo;
+
+        return staticSection.values.count;
     }
-    
+
+    NSParameterAssert(NO);
     return 0;
 }
 
@@ -574,10 +507,30 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         } else if ([propertyDescription isKindOfClass:[NSRelationshipDescription class]]) {
             return [self tableView:tableView cellForRelationshipDescription:propertyDescription atIndexPath:indexPath];
         }
+    } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerStaticEnumSection class]]) {
+        SLEntityViewControllerStaticEnumSection *staticSection = sectionInfo;
+
+        static NSString *CellIdentifier = @"SLEntityTableViewCellStaticEnum";
+
+        SLEntityTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+        if (cell == nil) {
+            cell = [[SLEntityTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        }
+
+        cell.textLabel.text = staticSection.humanReadableOptions[indexPath.row];
+        id currentValue = [self.entity valueForKey:staticSection.attribute];
+
+        if ([currentValue isEqual:staticSection.values[indexPath.row]]) {
+            cell.accessoryType = UITableViewCellAccessoryCheckmark;
+        } else {
+            cell.accessoryType = UITableViewCellAccessoryNone;
+        }
+        
+        return cell;
     } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerDynamicSection class]]) {
         SLEntityViewControllerDynamicSection *dynamicSection = sectionInfo;
 
-        static NSString *CellIdentifier = @"SLEntityTableViewCell";
+        static NSString *CellIdentifier = @"SLEntityTableViewCellDynamicSection";
 
         SLEntityTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
         if (cell == nil) {
@@ -654,8 +607,6 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     id sectionInfo = self.visibleSectionsInTableView[indexPath.section];
 
     if ([sectionInfo isKindOfClass:[SLEntityViewControllerStaticSection class]]) {
-//        SLEntityViewControllerStaticSection *staticSection = sectionInfo;
-
         NSString *property = [self propertyForIndexPath:indexPath];
         id propertyDescription = self.entityDescription.propertiesByName[property];
 
@@ -796,6 +747,14 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
             [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:[self indexPathForProperty:relationshipDescription.name].section]
                           withRowAnimation:UITableViewRowAnimationNone];
         }
+    } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerStaticEnumSection class]]) {
+        SLEntityViewControllerStaticEnumSection *staticSection = sectionInfo;
+
+        [self.entity setValue:staticSection.values[indexPath.row] forKey:staticSection.attribute];
+        [self _updateVisibleSectionsAnimated:YES];
+
+        [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:[self indexPathForProperty:staticSection.attribute].section]
+                      withRowAnimation:UITableViewRowAnimationNone];
     }
 
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
@@ -821,6 +780,9 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerDynamicSection class]]) {
         SLEntityViewControllerDynamicSection *dynamicSection = sectionInfo;
         return dynamicSection.relationship;
+    } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerStaticEnumSection class]]) {
+        SLEntityViewControllerStaticEnumSection *dynamicSection = sectionInfo;
+        return dynamicSection.attribute;
     }
 
     return nil;
@@ -839,8 +801,19 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
                 *stop = YES;
             }
         } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerDynamicSection class]]) {
-            indexPath = [NSIndexPath indexPathForRow:0 inSection:idx];
-            *stop = YES;
+            SLEntityViewControllerDynamicSection *dynamicSection = sectionInfo;
+
+            if ([dynamicSection.relationship isEqualToString:property]) {
+                indexPath = [NSIndexPath indexPathForRow:0 inSection:idx];
+                *stop = YES;
+            }
+        } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerStaticEnumSection class]]) {
+            SLEntityViewControllerStaticEnumSection *staticSection = sectionInfo;
+
+            if ([staticSection.attribute isEqualToString:property]) {
+                indexPath = [NSIndexPath indexPathForRow:0 inSection:idx];
+                *stop = YES;
+            }
         }
     }];
 
@@ -1356,6 +1329,8 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
             [visibleSections addObject:visibleSectionInfo];
         } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerDynamicSection class]]) {
+            [visibleSections addObject:sectionInfo];
+        } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerStaticEnumSection class]]) {
             [visibleSections addObject:sectionInfo];
         }
     }
