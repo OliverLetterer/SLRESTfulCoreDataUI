@@ -1290,6 +1290,54 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     [self.navigationController popToViewController:self animated:YES];
 }
 
+#pragma mark - NSFetchedResultsControllerDelegate
+
+- (void)controllerWillChangeContent:(NSFetchedResultsController *)controller
+{
+    [self.tableView beginUpdates];
+}
+
+- (void)controllerDidChangeContent:(NSFetchedResultsController *)controller
+{
+    [self.tableView endUpdates];
+}
+
+- (void)controller:(NSFetchedResultsController *)controller didChangeObject:(id)anObject atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type newIndexPath:(NSIndexPath *)newIndexPath
+{
+    NSUInteger index = [self.visibleSectionsInTableView indexOfObjectPassingTest:^BOOL(SLEntityViewControllerDynamicSection *section, NSUInteger idx, BOOL *stop) {
+        if (![section isKindOfClass:[SLEntityViewControllerDynamicSection class]]) {
+            return NO;
+        }
+
+        return section.fetchedResultsController == controller;
+    }];
+
+    if (index == NSNotFound) {
+        return;
+    }
+
+    SLEntityViewControllerDynamicSection *section = self.visibleSectionsInTableView[index];
+    NSUInteger sectionIndex = [self indexPathForProperty:section.relationship].section;
+
+    NSIndexPath *updatedIndexPath = [NSIndexPath indexPathForRow:indexPath.row inSection:sectionIndex];
+    NSIndexPath *updatedNewIndexPath = [NSIndexPath indexPathForRow:newIndexPath.row inSection:sectionIndex];
+
+    switch (type) {
+        case NSFetchedResultsChangeDelete:
+            [self.tableView deleteRowsAtIndexPaths:@[ updatedIndexPath ] withRowAnimation:UITableViewRowAnimationTop];
+            break;
+        case NSFetchedResultsChangeInsert:
+            [self.tableView insertRowsAtIndexPaths:@[ updatedNewIndexPath ] withRowAnimation:UITableViewRowAnimationTop];
+            break;
+        case NSFetchedResultsChangeMove:
+            [self.tableView moveRowAtIndexPath:updatedIndexPath toIndexPath:updatedNewIndexPath];
+            break;
+        case NSFetchedResultsChangeUpdate:
+            [self.tableView reloadRowsAtIndexPaths:@[ updatedIndexPath ] withRowAnimation:UITableViewRowAnimationNone];
+            break;
+    }
+}
+
 #pragma mark - Private category implementation ()
 
 - (void)_textFieldEditingChanged:(UITextField *)sender
