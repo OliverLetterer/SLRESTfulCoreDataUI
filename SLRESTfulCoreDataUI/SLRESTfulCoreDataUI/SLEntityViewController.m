@@ -343,6 +343,13 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         self.contentSizeForViewInPopover = CGSizeMake(320.0f, 480.0f);
 #endif
 
+        if (entity.managedObjectContext) {
+            [[NSNotificationCenter defaultCenter] addObserver:self
+                                                     selector:@selector(_entitiesManagedObjectContextDidChangeCallback:)
+                                                         name:NSManagedObjectContextObjectsDidChangeNotification
+                                                       object:entity.managedObjectContext];
+        }
+
         self.modalInPopover = YES;
 
         if ([self respondsToSelector:@selector(setRestorationIdentifier:)]) {
@@ -359,6 +366,11 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 {
     [super didReceiveMemoryWarning];
 
+}
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];;
 }
 
 #pragma mark - View lifecycle
@@ -401,7 +413,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     if (!self.isMovingToParentViewController) {
         return;
     }
-    
+
     for (id section in self.sections) {
         if (![section isKindOfClass:[SLEntityViewControllerStaticSection class]]) {
             continue;
@@ -525,7 +537,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         } else {
             cell.accessoryType = UITableViewCellAccessoryNone;
         }
-        
+
         return cell;
     } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerDynamicSection class]]) {
         SLEntityViewControllerDynamicSection *dynamicSection = sectionInfo;
@@ -548,7 +560,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         } else {
             cell.accessoryType = thisEntity == [self.entity valueForKey:relationshipDescription.name] ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
         }
-        
+
         return cell;
     }
 
@@ -711,12 +723,12 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
             if ([self.view respondsToSelector:@selector(tintColor)]) {
                 viewController.view.tintColor = self.view.tintColor;
             }
-            
+
             if ([self.tableView.backgroundView isKindOfClass:[UIImageView class]]) {
                 UIImageView *imageView = (UIImageView *)self.tableView.backgroundView;
                 viewController.tableView.backgroundView = [[UIImageView alloc] initWithImage:imageView.image];
             }
-            
+
             [self.navigationController pushViewController:viewController animated:YES];
             return;
         }
@@ -1455,22 +1467,42 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
                     if ([previousVisibleProperties containsObject:property]) {
                         continue;
                     }
-
+                    
                     [insertedIndexPaths addObject:[NSIndexPath indexPathForRow:[visibleProperties indexOfObject:property]
                                                                      inSection:previousVisibleSectionIndex]];
                 }
-
+                
                 [self.tableView deleteRowsAtIndexPaths:deletedIndexPaths withRowAnimation:UITableViewRowAnimationTop];
                 [self.tableView insertRowsAtIndexPaths:insertedIndexPaths withRowAnimation:UITableViewRowAnimationTop];
             }
         }
-
+        
         if (previousVisibleSection.isVisible) {
             previousVisibleSectionIndex++;
         }
     }];
-
+    
     [self.tableView endUpdates];
+}
+
+- (void)_entitiesManagedObjectContextDidChangeCallback:(NSNotification *)notification
+{
+    NSArray *deletedObjects = notification.userInfo[NSDeletedObjectsKey];
+    if (![deletedObjects containsObject:self.entity]) {
+        return;
+    }
+    
+    NSArray *viewControllers = self.navigationController.viewControllers;
+    NSInteger index = [viewControllers indexOfObject:self];
+    
+    if (self.navigationController && index != NSNotFound && index > 0) {
+        [self.navigationController popToViewController:viewControllers[index - 1] animated:YES];
+    } else {
+        if (self.completionHandler) {
+            self.completionHandler(NO);
+            self.completionHandler = NULL;
+        }
+    }
 }
 
 @end
