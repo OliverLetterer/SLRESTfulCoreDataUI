@@ -632,13 +632,13 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
             if (attributeDescription.attributeType == NSBooleanAttributeType) {
                 [self.entity setValue:@(![[self.entity valueForKey:attributeDescription.name] boolValue]) forKey:attributeDescription.name];
-                [self _updateVisibleSectionsAnimated:YES];
 
                 SLEntitySwitchCell *cell = (SLEntitySwitchCell *)[tableView cellForRowAtIndexPath:indexPath];
                 if ([cell isKindOfClass:[SLEntitySwitchCell class]]) {
                     [cell.switchControl setOn:[[self.entity valueForKey:attributeDescription.name] boolValue] animated:YES];
                 }
 
+                [self _updateVisibleSectionsAnimated:YES];
                 return;
             }
 
