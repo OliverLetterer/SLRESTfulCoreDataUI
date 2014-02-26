@@ -86,6 +86,13 @@ static NSString *capitalizedString(NSString *string)
     
 }
 
+- (void)dealloc
+{
+    if (self.fetchedResultsController.delegate == self) {
+        self.fetchedResultsController.delegate = nil;
+    }
+}
+
 #pragma mark - View lifecycle
 
 //- (void)loadView
