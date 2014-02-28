@@ -51,6 +51,26 @@ viewController.propertyMapping = @{
 }];
 ```
 
+To now display any data to the user, SLEntityViewController takes an array of sections in `SLEntityViewController.sections`:
+
+``` objc
+@interface SLEntityViewControllerSection : NSObject <NSCopying>
+
+// a static section which displays basic properties of the entity. These can belong to attributes or relationships.
++ (instancetype)staticSectionWithProperties:(NSArray *)properties;
+
+// let the user choose an option from a finite set of values.
+// enumValues will applied to your entity and humanReadableOptions will be displayed to the user for selection.
++ (instancetype)staticSectionWithEnumValue:(NSArray *)enumValues humanReadableOptions:(NSArray *)humanReadableOptions forAttribute:(NSString *)attribute;
+
+// Let the user choose entites for to-one or to-many relationships based on the specified fetchedResultsController.
++ (instancetype)dynamicSectionWithRelationship:(NSString *)relationship
+                      fetchedResultsController:(NSFetchedResultsController *)fetchedResultsController
+                                   formatBlock:(NSString *(^)(id entity))formatBlock;
+
+@end
+```
+
 ## Contact
 Oliver Letterer
 
