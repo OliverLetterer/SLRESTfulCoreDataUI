@@ -45,9 +45,9 @@ typedef NS_ENUM(NSUInteger, SLEntityViewControllerEditingType) {
 
 + (instancetype)staticSectionWithEnumValue:(NSArray *)enumValues humanReadableOptions:(NSArray *)humanReadableOptions forAttribute:(NSString *)attribute;
 
-+ (instancetype)dynamicEntityWithRelationship:(NSString *)relationship
-                     fetchedResultsController:(NSFetchedResultsController *)fetchedResultsController
-                                  formatBlock:(NSString *(^)(id entity))formatBlock;
++ (instancetype)dynamicSectionWithRelationship:(NSString *)relationship
+                      fetchedResultsController:(NSFetchedResultsController *)fetchedResultsController
+                                   formatBlock:(NSString *(^)(id entity))formatBlock;
 
 @end
 

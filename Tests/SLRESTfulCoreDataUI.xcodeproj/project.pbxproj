@@ -16,6 +16,7 @@
 		A711F0CC18C082D0005A4100 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A711F0CB18C082D0005A4100 /* main.m */; };
 		A711F0D018C082D0005A4100 /* SLAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A711F0CF18C082D0005A4100 /* SLAppDelegate.m */; };
 		A711F0D218C082D0005A4100 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A711F0D118C082D0005A4100 /* Images.xcassets */; };
+		A7235F9A18C0984300D0EADE /* SLEntity2.m in Sources */ = {isa = PBXBuildFile; fileRef = A7235F9918C0984300D0EADE /* SLEntity2.m */; };
 		A7A3BC2D18C0884B00B18031 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7A3BC2C18C0884B00B18031 /* SenTestingKit.framework */; };
 		A7A3BC2E18C0884B00B18031 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A711F0BF18C082D0005A4100 /* Foundation.framework */; };
 		A7A3BC2F18C0884B00B18031 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A711F0C318C082D0005A4100 /* UIKit.framework */; };
@@ -52,6 +53,8 @@
 		A711F0CF18C082D0005A4100 /* SLAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SLAppDelegate.m; sourceTree = "<group>"; };
 		A711F0D118C082D0005A4100 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		A711F0D818C082D0005A4100 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		A7235F9818C0984300D0EADE /* SLEntity2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SLEntity2.h; sourceTree = "<group>"; };
+		A7235F9918C0984300D0EADE /* SLEntity2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SLEntity2.m; sourceTree = "<group>"; };
 		A7A3BC2B18C0884B00B18031 /* SLRESTfulCoreDataUITests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SLRESTfulCoreDataUITests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7A3BC2C18C0884B00B18031 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 		A7A3BC3218C0884B00B18031 /* SLRESTfulCoreDataUITests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SLRESTfulCoreDataUITests-Info.plist"; sourceTree = "<group>"; };
@@ -174,6 +177,8 @@
 			children = (
 				A7A3BC4518C08E3E00B18031 /* SLEntity1.h */,
 				A7A3BC4618C08E3E00B18031 /* SLEntity1.m */,
+				A7235F9818C0984300D0EADE /* SLEntity2.h */,
+				A7235F9918C0984300D0EADE /* SLEntity2.m */,
 				A7A3BC3E18C08D8900B18031 /* SLTestCoreDataStack.h */,
 				A7A3BC3F18C08D8900B18031 /* SLTestCoreDataStack.m */,
 				A7A3BC4218C08DB900B18031 /* SLTestCoreDataStack.xcdatamodeld */,
@@ -353,6 +358,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A7235F9A18C0984300D0EADE /* SLEntity2.m in Sources */,
 				A7A3BC4418C08DB900B18031 /* SLTestCoreDataStack.xcdatamodeld in Sources */,
 				A7A3BC4018C08D8900B18031 /* SLTestCoreDataStack.m in Sources */,
 				A7A3BC3718C0884B00B18031 /* SLRESTfulCoreDataUITests.m in Sources */,
@@ -508,7 +514,6 @@
 				);
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "SLRESTfulCoreDataUITests/SLRESTfulCoreDataUITests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = octest;
@@ -529,7 +534,6 @@
 				GCC_PREFIX_HEADER = "SLRESTfulCoreDataUITests/SLRESTfulCoreDataUITests-Prefix.pch";
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				INFOPLIST_FILE = "SLRESTfulCoreDataUITests/SLRESTfulCoreDataUITests-Info.plist";
-				IPHONEOS_DEPLOYMENT_TARGET = 7.1;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUNDLE_LOADER)";
 				WRAPPER_EXTENSION = octest;

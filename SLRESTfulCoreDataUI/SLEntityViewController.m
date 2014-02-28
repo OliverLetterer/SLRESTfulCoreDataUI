@@ -96,9 +96,9 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     return section;
 }
 
-+ (instancetype)dynamicEntityWithRelationship:(NSString *)relationship
-                     fetchedResultsController:(NSFetchedResultsController *)fetchedResultsController
-                                  formatBlock:(NSString *(^)(id entity))formatBlock
++ (instancetype)dynamicSectionWithRelationship:(NSString *)relationship
+                      fetchedResultsController:(NSFetchedResultsController *)fetchedResultsController
+                                   formatBlock:(NSString *(^)(id entity))formatBlock
 {
     SLEntityViewControllerDynamicSection *section = [[SLEntityViewControllerDynamicSection alloc] init];
     section.relationship = relationship;

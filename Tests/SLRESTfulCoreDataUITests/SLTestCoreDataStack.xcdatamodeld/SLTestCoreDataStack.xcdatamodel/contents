@@ -1,11 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="5059" systemVersion="13C64" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
+<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="3401" systemVersion="13C64" minimumToolsVersion="Xcode 4.3" macOSVersion="Automatic" iOSVersion="Automatic">
     <entity name="SLEntity1" representedClassName="SLEntity1" syncable="YES">
         <attribute name="booleanValue" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="dateValue" optional="YES" attributeType="Date" syncable="YES"/>
         <attribute name="stringValue" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="toManyRelation" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="SLEntity2" inverseName="toManyInverse" inverseEntity="SLEntity2" syncable="YES"/>
+        <relationship name="toOneRelation" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SLEntity2" inverseName="toOneInverse" inverseEntity="SLEntity2" syncable="YES"/>
+    </entity>
+    <entity name="SLEntity2" representedClassName="SLEntity2" syncable="YES">
+        <attribute name="name" optional="YES" attributeType="String" syncable="YES"/>
+        <relationship name="toManyInverse" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SLEntity1" inverseName="toManyRelation" inverseEntity="SLEntity1" syncable="YES"/>
+        <relationship name="toOneInverse" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SLEntity1" inverseName="toOneRelation" inverseEntity="SLEntity1" syncable="YES"/>
     </entity>
     <elements>
-        <element name="SLEntity1" positionX="-63" positionY="-18" width="128" height="90"/>
+        <element name="SLEntity1" positionX="0" positionY="0" width="0" height="0"/>
+        <element name="SLEntity2" positionX="0" positionY="0" width="0" height="0"/>
     </elements>
 </model>
