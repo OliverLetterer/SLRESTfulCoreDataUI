@@ -6,7 +6,16 @@
 //  Copyright (c) 2014 Sparrow-Labs. All rights reserved.
 //
 
+#import <SLRESTfulCoreDataUI.h>
+#import "SLEntity1.h"
+#import "SLTestCoreDataStack.h"
+
 @interface SLRESTfulCoreDataUITests : SenTestCase
+
+@property (nonatomic, strong) SLEntityViewController *viewController;
+@property (nonatomic, strong) SLEntity1 *entity;
+
+@property (nonatomic, strong) NSManagedObjectContext *context;
 
 @end
 
@@ -15,18 +24,45 @@
 - (void)setUp
 {
     [super setUp];
-    // Put setup code here. This method is called before the invocation of each test method in the class.
+
+    self.context = [SLTestCoreDataStack sharedInstance].mainThreadManagedObjectContext;
+    self.entity = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass([SLEntity1 class])
+                                                inManagedObjectContext:self.context];
+
+    self.viewController = [[SLEntityViewController alloc] initWithEntity:self.entity editingType:SLEntityViewControllerEditingTypeCreate];
+    self.viewController.propertyMapping = @{
+                                            @"booleanValue": @"BOOL",
+                                            @"stringValue": @"String",
+                                            @"dateValue": @"Date",
+                                            };
+
+    [UIApplication sharedApplication].delegate.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:self.viewController];
 }
 
 - (void)tearDown
 {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
     [super tearDown];
+
+    [[SLTestCoreDataStack sharedInstance] wipeDataStore];
 }
 
-- (void)testExample
+- (void)testThatSLEntityViewControllerCanDisplayAStaticSection
 {
-    STFail(@"No implementation for \"%s\"", __PRETTY_FUNCTION__);
+    NSArray *attributes = @[ NSStringFromSelector(@selector(booleanValue)), NSStringFromSelector(@selector(dateValue)), NSStringFromSelector(@selector(stringValue)) ];
+    SLEntityViewControllerSection *staticSection = [SLEntityViewControllerSection staticSectionWithProperties:attributes];
+
+    self.viewController.sections = @[
+                                     staticSection,
+                                     ];
+
+    [tester waitForTimeInterval:1.0];
+    [[UIApplication sharedApplication] sendAction:@selector(resignFirstResponder) to:nil from:nil forEvent:nil];
+
+    [tester enterText:@"long text" intoViewWithAccessibilityLabel:@"String"];
+    expect(self.entity.stringValue).to.equal(@"long text");
+
+    [tester setOn:YES forSwitchWithAccessibilityLabel:@"BOOL"];
+    expect(self.entity.booleanValue).to.beTruthy();
 }
 
 @end

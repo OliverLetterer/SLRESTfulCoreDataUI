@@ -7,9 +7,10 @@
 #ifdef __OBJC__
     #import <UIKit/UIKit.h>
     #import <Foundation/Foundation.h>
+    #import <CoreData/CoreData.h>
     #import <SenTestingKit/SenTestingKit.h>
-    #import <KIF/KIF.h>
 
     #define EXP_SHORTHAND
     #import <Expecta/Expecta.h>
+    #import <KIF/KIF.h>
 #endif

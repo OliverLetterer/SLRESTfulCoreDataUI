@@ -867,6 +867,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
         cell.textField.text = [self stringValueForAttribute:attributeDescription.name];
         cell.textField.placeholder = cell.textLabel.text;
+        cell.textField.accessibilityLabel = cell.textField.placeholder;
         cell.textField.autocapitalizationType = UITextAutocapitalizationTypeSentences;
         cell.textField.keyboardType = [self keyboardTypeForAttribute:attributeDescription.name];
         cell.textField.autocorrectionType = UITextAutocorrectionTypeNo;
@@ -918,6 +919,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
         cell.textLabel.text = self.propertyMapping[attributeDescription.name];
         cell.switchControl.on = [[self.entity valueForKey:attributeDescription.name] boolValue];
+        cell.switchControl.accessibilityLabel = cell.textLabel.text;
         objc_setAssociatedObject(cell.switchControl, &SLEntityViewControllerAttributeDescriptionKey,
                                  attributeDescription, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 
