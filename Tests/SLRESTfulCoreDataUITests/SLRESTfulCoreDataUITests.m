@@ -48,12 +48,10 @@
 
 - (void)testThatSLEntityViewControllerCanDisplayAStaticSection
 {
-    NSArray *attributes = @[ NSStringFromSelector(@selector(booleanValue)), NSStringFromSelector(@selector(dateValue)), NSStringFromSelector(@selector(stringValue)) ];
+    NSArray *attributes = @[ @"booleanValue", @"dateValue", @"stringValue" ];
     SLEntityViewControllerSection *staticSection = [SLEntityViewControllerSection staticSectionWithProperties:attributes];
 
-    self.viewController.sections = @[
-                                     staticSection,
-                                     ];
+    self.viewController.sections = @[ staticSection ];
 
     [tester waitForTimeInterval:1.0];
     [[UIApplication sharedApplication] sendAction:@selector(resignFirstResponder) to:nil from:nil forEvent:nil];
@@ -63,6 +61,59 @@
 
     [tester setOn:YES forSwitchWithAccessibilityLabel:@"BOOL"];
     expect(self.entity.booleanValue).to.beTruthy();
+}
+
+- (void)testThatSLEntityViewControllerCanHideAttributesOfTheSameSection
+{
+    self.entity.booleanValue = @NO;
+
+    NSArray *attributes = @[ @"booleanValue", @"dateValue", @"stringValue" ];
+    SLEntityViewControllerSection *staticSection = [SLEntityViewControllerSection staticSectionWithProperties:attributes];
+
+    self.viewController.sections = @[ staticSection ];
+
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"booleanValue == NO"];
+    [self.viewController onlyShowAttribute:@"dateValue" whenPredicateEvaluates:predicate];
+    [self.viewController onlyShowAttribute:@"stringValue" whenPredicateEvaluates:predicate];
+
+    [tester waitForTimeInterval:1.0];
+    [[UIApplication sharedApplication] sendAction:@selector(resignFirstResponder) to:nil from:nil forEvent:nil];
+
+    [tester setOn:YES forSwitchWithAccessibilityLabel:@"BOOL"];
+    [tester waitForAbsenceOfViewWithAccessibilityLabel:@"String"];
+    [tester waitForAbsenceOfViewWithAccessibilityLabel:@"Date"];
+
+    [tester setOn:NO forSwitchWithAccessibilityLabel:@"BOOL"];
+    [tester waitForViewWithAccessibilityLabel:@"String"];
+    [tester waitForViewWithAccessibilityLabel:@"Date"];
+}
+
+- (void)testThatSLEntityViewControllerCanHideAttributesOfAnotherSection
+{
+    self.entity.booleanValue = @NO;
+
+    SLEntityViewControllerSection *staticSection1 = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"booleanValue" ]];
+    SLEntityViewControllerSection *staticSection2 = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"dateValue", @"stringValue" ]];
+
+    staticSection1.titleText = @"Section 1";
+    staticSection2.titleText = @"Section 1";
+
+    self.viewController.sections = @[ staticSection1, staticSection2 ];
+
+    NSPredicate *predicate = [NSPredicate predicateWithFormat:@"booleanValue == NO"];
+    [self.viewController onlyShowAttribute:@"dateValue" whenPredicateEvaluates:predicate];
+    [self.viewController onlyShowAttribute:@"stringValue" whenPredicateEvaluates:predicate];
+
+    [tester waitForTimeInterval:1.0];
+    [[UIApplication sharedApplication] sendAction:@selector(resignFirstResponder) to:nil from:nil forEvent:nil];
+
+    [tester setOn:YES forSwitchWithAccessibilityLabel:@"BOOL"];
+    [tester waitForAbsenceOfViewWithAccessibilityLabel:@"String"];
+    [tester waitForAbsenceOfViewWithAccessibilityLabel:@"Date"];
+
+    [tester setOn:NO forSwitchWithAccessibilityLabel:@"BOOL"];
+    [tester waitForViewWithAccessibilityLabel:@"String"];
+    [tester waitForViewWithAccessibilityLabel:@"Date"];
 }
 
 @end

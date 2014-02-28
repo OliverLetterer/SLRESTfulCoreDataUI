@@ -876,9 +876,9 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
             UIDatePicker *datePicker = [[UIDatePicker alloc] init];
             datePicker.datePickerMode = UIDatePickerModeDateAndTime;
 
-            cell.textField.inputAccessoryView = datePicker;
+            cell.textField.inputView = datePicker;
         } else {
-            cell.textField.inputAccessoryView = nil;
+            cell.textField.inputView = nil;
         }
 
         [self configureTextFieldCell:cell forAttribute:attributeDescription.name];
