@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>3BED045E-6A8F-4E01-8CBB-B625B3036E14</string>
+	<key>IDESourceControlProjectName</key>
+	<string>SLRESTfulCoreDataUI</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>8EA6AEB0-0A97-4106-9425-C535CD3447FA</key>
+		<string>ssh://github.com/OliverLetterer/SLRESTfulCoreDataUI.git</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>Tests/SLRESTfulCoreDataUI/SLRESTfulCoreDataUI.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>8EA6AEB0-0A97-4106-9425-C535CD3447FA</key>
+		<string>../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>ssh://github.com/OliverLetterer/SLRESTfulCoreDataUI.git</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>8EA6AEB0-0A97-4106-9425-C535CD3447FA</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>8EA6AEB0-0A97-4106-9425-C535CD3447FA</string>
+			<key>IDESourceControlWCCName</key>
+			<string>SLRESTfulCoreDataUI</string>
+		</dict>
+	</array>
+</dict>
+</plist>

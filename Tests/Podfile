@@ -1,0 +1,13 @@
+xcodeproj 'SLRESTfulCoreDataUI'
+workspace '../SLRESTfulCoreDataUI'
+inhibit_all_warnings!
+
+platform :ios, '7.0'
+
+pod 'SLRESTfulCoreDataUI', path: '..'
+
+target 'SLRESTfulCoreDataUITests', :exclusive => true do
+  pod 'OCMock', '~> 2.2.0'
+  pod 'Expecta', '~> 0.2.2'
+  pod 'KIF', '~> 2.0.0'
+end

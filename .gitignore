@@ -9,6 +9,7 @@ build/
 xcuserdata/
 xcuserdata/*
 *.xcuserdatad/
+Pods/
 
 # Textmate - if you build your xcode projects with it
 *.tm_build_errors
