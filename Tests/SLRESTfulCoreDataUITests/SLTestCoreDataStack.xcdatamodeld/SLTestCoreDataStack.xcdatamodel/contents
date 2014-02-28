@@ -3,6 +3,7 @@
     <entity name="SLEntity1" representedClassName="SLEntity1" syncable="YES">
         <attribute name="booleanValue" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="dateValue" optional="YES" attributeType="Date" syncable="YES"/>
+        <attribute name="dummyBool" optional="YES" attributeType="Boolean" syncable="YES"/>
         <attribute name="stringValue" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="toManyRelation" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="SLEntity2" inverseName="toManyInverse" inverseEntity="SLEntity2" syncable="YES"/>
         <relationship name="toOneRelation" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="SLEntity2" inverseName="toOneInverse" inverseEntity="SLEntity2" syncable="YES"/>

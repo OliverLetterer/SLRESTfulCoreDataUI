@@ -43,23 +43,24 @@ static NSString *capitalizedString(NSString *string)
     return [[string substringToIndex:1] stringByAppendingString:[string substringFromIndex:1]];
 }
 
-char *const SLEntityViewControllerAttributeDescriptionKey;
+
 
 @interface SLEntityViewControllerSection ()
-@property (nonatomic, readonly) BOOL isVisible;
+@property (nonatomic, strong) NSNumber *lastVisibility;
+- (BOOL)isVisibleInEntityViewController:(SLEntityViewController *)viewController;
 @end
 
-@interface SLEntityViewControllerStaticSection : SLEntityViewControllerSection
+@interface SLEntityViewControllerStaticSection : SLEntityViewControllerSection <NSCopying>
 @property (nonatomic, strong) NSArray *properties;
 @end
 
-@interface SLEntityViewControllerStaticEnumSection : SLEntityViewControllerSection
+@interface SLEntityViewControllerStaticEnumSection : SLEntityViewControllerSection <NSCopying>
 @property (nonatomic, strong) NSString *attribute;
 @property (nonatomic, strong) NSArray *values;
 @property (nonatomic, strong) NSArray *humanReadableOptions;
 @end
 
-@interface SLEntityViewControllerDynamicSection : SLEntityViewControllerSection
+@interface SLEntityViewControllerDynamicSection : SLEntityViewControllerSection <NSCopying>
 @property (nonatomic, copy) NSString *relationship;
 @property (nonatomic, strong) NSFetchedResultsController *fetchedResultsController;
 @property (nonatomic, copy) NSString *(^formatBlock)(id entity);
@@ -67,11 +68,51 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 
 
+char *const SLEntityViewControllerAttributeDescriptionKey;
+
+@interface SLEntityViewController () <SLSelectEnumAttributeViewControllerDelegate, NSFetchedResultsControllerDelegate> {
+    NSManagedObject *_entity;
+}
+
+@property (nonatomic, strong) NSArray *currentlyVisibleSectionsInTableView;
+
+@property (nonatomic, strong) NSMutableDictionary *keyboardTypes;
+@property (nonatomic, strong) NSMutableDictionary *viewControllerClasses;
+@property (nonatomic, strong) NSMutableDictionary *fetchedResultsControllers;
+@property (nonatomic, strong) NSMutableDictionary *relationshipNameKeyPaths;
+
+@property (nonatomic, strong) NSMutableDictionary *enumValues;
+@property (nonatomic, strong) NSMutableDictionary *enumOptions;
+@property (nonatomic, strong) NSMutableDictionary *enumOptionsValueMappings;
+
+@property (nonatomic, strong) NSMutableDictionary *predicates;
+
+@property (nonatomic, strong) NSEntityDescription *entityDescription;
+
+//@property (nonatomic, strong) NSArray *sections;
+@property (nonatomic, readonly) NSArray *visibleSections;
+- (void)setVisibleSections:(NSArray *)sections animateDiff:(BOOL)animateDiff;
+
+@end
+
+
+
+
 @implementation SLEntityViewControllerSection
+
+#pragma mark - NSCopying
+
+- (instancetype)copyWithZone:(NSZone *)zone
+{
+    SLEntityViewControllerSection *section = [[self.class alloc] init];
+    section.titleText = self.titleText;
+    section.footerText = self.footerText;
+    return section;
+}
 
 #pragma mark - setters and getters
 
-- (BOOL)isVisible
+- (BOOL)isVisibleInEntityViewController:(SLEntityViewController *)viewController
 {
     return NO;
 }
@@ -114,7 +155,14 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 @implementation SLEntityViewControllerStaticSection
 
-- (BOOL)isVisible
+- (instancetype)copyWithZone:(NSZone *)zone
+{
+    SLEntityViewControllerStaticSection *section = [super copyWithZone:zone];
+    section.properties = self.properties;
+    return section;
+}
+
+- (BOOL)isVisibleInEntityViewController:(SLEntityViewController *)viewController
 {
     return self.properties.count > 0;
 }
@@ -123,8 +171,28 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 @implementation SLEntityViewControllerDynamicSection
 
-- (BOOL)isVisible
+- (instancetype)copyWithZone:(NSZone *)zone
 {
+    SLEntityViewControllerDynamicSection *section = [super copyWithZone:zone];
+    section.fetchedResultsController = self.fetchedResultsController;
+    section.relationship = self.relationship;
+    section.formatBlock = self.formatBlock;
+    return section;
+}
+
+- (BOOL)isVisibleInEntityViewController:(SLEntityViewController *)viewController
+{
+    if (self.lastVisibility) {
+        return self.lastVisibility.boolValue;
+    }
+
+    for (NSString *attribute in viewController.predicates) {
+        if ([attribute isEqualToString:self.relationship]) {
+            NSPredicate *predicate = viewController.predicates[attribute];
+            return [predicate evaluateWithObject:viewController.entity];
+        }
+    }
+
     return YES;
 }
 
@@ -132,8 +200,28 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 @implementation SLEntityViewControllerStaticEnumSection
 
-- (BOOL)isVisible
+- (instancetype)copyWithZone:(NSZone *)zone
 {
+    SLEntityViewControllerStaticEnumSection *section = [super copyWithZone:zone];
+    section.attribute = self.attribute;
+    section.values = self.values;
+    section.humanReadableOptions = self.humanReadableOptions;
+    return section;
+}
+
+- (BOOL)isVisibleInEntityViewController:(SLEntityViewController *)viewController
+{
+    if (self.lastVisibility) {
+        return self.lastVisibility.boolValue;
+    }
+
+    for (NSString *attribute in viewController.predicates) {
+        if ([attribute isEqualToString:self.attribute]) {
+            NSPredicate *predicate = viewController.predicates[attribute];
+            return [predicate evaluateWithObject:viewController.entity];
+        }
+    }
+
     return YES;
 }
 
@@ -141,49 +229,10 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 
 
-@interface SLEntityViewController () <SLSelectEnumAttributeViewControllerDelegate, NSFetchedResultsControllerDelegate> {
-    NSManagedObject *_entity;
-}
-
-@property (nonatomic, readonly) NSArray *visibleSectionsInTableView;
-
-@property (nonatomic, strong) NSMutableDictionary *keyboardTypes;
-@property (nonatomic, strong) NSMutableDictionary *viewControllerClasses;
-@property (nonatomic, strong) NSMutableDictionary *fetchedResultsControllers;
-@property (nonatomic, strong) NSMutableDictionary *relationshipNameKeyPaths;
-
-@property (nonatomic, strong) NSMutableDictionary *enumValues;
-@property (nonatomic, strong) NSMutableDictionary *enumOptions;
-@property (nonatomic, strong) NSMutableDictionary *enumOptionsValueMappings;
-
-@property (nonatomic, strong) NSMutableDictionary *predicates;
-
-@property (nonatomic, strong) NSEntityDescription *entityDescription;
-
-//@property (nonatomic, strong) NSArray *sections;
-@property (nonatomic, readonly) NSArray *visibleSections;
-- (void)setVisibleSections:(NSArray *)sections animateDiff:(BOOL)animateDiff;
-
-@end
-
-
 
 @implementation SLEntityViewController
 
 #pragma mark - setters and getters
-
-- (NSArray *)visibleSectionsInTableView
-{
-    NSMutableArray *visibleSectionsInTableView = [NSMutableArray array];
-
-    for (SLEntityViewControllerSection *section in self.visibleSections) {
-        if (section.isVisible) {
-            [visibleSectionsInTableView addObject:section];
-        }
-    }
-
-    return visibleSectionsInTableView;
-}
 
 - (void)setEntity:(id)entity
 {
@@ -307,8 +356,20 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (void)setVisibleSections:(NSArray *)sections animateDiff:(BOOL)animateDiff
 {
     if (![sections isEqualToArray:_visibleSections]) {
-        NSArray *previousSecions = _visibleSections;
+        NSArray *previousSecions = self.currentlyVisibleSectionsInTableView;
+
+        NSMutableArray *currentlyVisibleSectionsInTableView = [NSMutableArray array];
+
+        for (SLEntityViewControllerSection *section in sections) {
+            if ([section isVisibleInEntityViewController:self]) {
+                SLEntityViewControllerSection *sectionCopy = [section copy];
+                sectionCopy.lastVisibility = @YES;
+                [currentlyVisibleSectionsInTableView addObject:sectionCopy];
+            }
+        }
+
         _visibleSections = sections;
+        self.currentlyVisibleSectionsInTableView = currentlyVisibleSectionsInTableView;
 
         if (self.isViewLoaded) {
             if (self.view.window && animateDiff) {
@@ -480,12 +541,12 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
 {
     // Return the number of sections.
-    return self.visibleSectionsInTableView.count;
+    return self.currentlyVisibleSectionsInTableView.count;
 }
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
-    id sectionInfo = self.visibleSectionsInTableView[section];
+    id sectionInfo = self.currentlyVisibleSectionsInTableView[section];
 
     if ([sectionInfo isKindOfClass:[SLEntityViewControllerStaticSection class]]) {
         SLEntityViewControllerStaticSection *staticSection = sectionInfo;
@@ -506,7 +567,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    id sectionInfo = self.visibleSectionsInTableView[indexPath.section];
+    id sectionInfo = self.currentlyVisibleSectionsInTableView[indexPath.section];
 
     if ([sectionInfo isKindOfClass:[SLEntityViewControllerStaticSection class]]) {
         SLEntityViewControllerStaticSection *staticSection = sectionInfo;
@@ -602,13 +663,13 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
-    SLEntityViewControllerSection *sectionInfo = self.visibleSectionsInTableView[section];
+    SLEntityViewControllerSection *sectionInfo = self.currentlyVisibleSectionsInTableView[section];
     return sectionInfo.titleText;
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForFooterInSection:(NSInteger)section
 {
-    SLEntityViewControllerSection *sectionInfo = self.visibleSectionsInTableView[section];
+    SLEntityViewControllerSection *sectionInfo = self.currentlyVisibleSectionsInTableView[section];
     return sectionInfo.footerText;
 }
 
@@ -616,7 +677,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    id sectionInfo = self.visibleSectionsInTableView[indexPath.section];
+    id sectionInfo = self.currentlyVisibleSectionsInTableView[indexPath.section];
 
     if ([sectionInfo isKindOfClass:[SLEntityViewControllerStaticSection class]]) {
         NSString *property = [self propertyForIndexPath:indexPath];
@@ -784,7 +845,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (NSString *)propertyForIndexPath:(NSIndexPath *)indexPath
 {
-    id sectionInfo = self.visibleSectionsInTableView[indexPath.section];
+    id sectionInfo = self.currentlyVisibleSectionsInTableView[indexPath.section];
 
     if ([sectionInfo isKindOfClass:[SLEntityViewControllerStaticSection class]]) {
         SLEntityViewControllerStaticSection *staticSection = sectionInfo;
@@ -804,7 +865,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 {
     __block NSIndexPath *indexPath = nil;
 
-    [self.visibleSectionsInTableView enumerateObjectsUsingBlock:^(id sectionInfo, NSUInteger idx, BOOL *stop) {
+    [self.currentlyVisibleSectionsInTableView enumerateObjectsUsingBlock:^(id sectionInfo, NSUInteger idx, BOOL *stop) {
         if ([sectionInfo isKindOfClass:[SLEntityViewControllerStaticSection class]]) {
             SLEntityViewControllerStaticSection *staticSection = sectionInfo;
 
@@ -1318,7 +1379,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (void)controller:(NSFetchedResultsController *)controller didChangeObject:(id)anObject atIndexPath:(NSIndexPath *)indexPath forChangeType:(NSFetchedResultsChangeType)type newIndexPath:(NSIndexPath *)newIndexPath
 {
-    NSUInteger index = [self.visibleSectionsInTableView indexOfObjectPassingTest:^BOOL(SLEntityViewControllerDynamicSection *section, NSUInteger idx, BOOL *stop) {
+    NSUInteger index = [self.currentlyVisibleSectionsInTableView indexOfObjectPassingTest:^BOOL(SLEntityViewControllerDynamicSection *section, NSUInteger idx, BOOL *stop) {
         if (![section isKindOfClass:[SLEntityViewControllerDynamicSection class]]) {
             return NO;
         }
@@ -1330,7 +1391,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         return;
     }
 
-    SLEntityViewControllerDynamicSection *section = self.visibleSectionsInTableView[index];
+    SLEntityViewControllerDynamicSection *section = self.currentlyVisibleSectionsInTableView[index];
     NSUInteger sectionIndex = [self indexPathForProperty:section.relationship].section;
 
     NSIndexPath *updatedIndexPath = [NSIndexPath indexPathForRow:indexPath.row inSection:sectionIndex];
@@ -1391,9 +1452,9 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
             [visibleSections addObject:visibleSectionInfo];
         } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerDynamicSection class]]) {
-            [visibleSections addObject:sectionInfo];
+            [visibleSections addObject:[sectionInfo copy]];
         } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerStaticEnumSection class]]) {
-            [visibleSections addObject:sectionInfo];
+            [visibleSections addObject:[sectionInfo copy]];
         }
     }
 
@@ -1441,11 +1502,11 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     [visibleSections enumerateObjectsUsingBlock:^(SLEntityViewControllerSection *visibleSection, NSUInteger idx, BOOL *stop) {
         SLEntityViewControllerSection *previousVisibleSection = previousVisibleSections[idx];
 
-        if (visibleSection.isVisible && !previousVisibleSection.isVisible) {
+        if ([visibleSection isVisibleInEntityViewController:self] && ![previousVisibleSection isVisibleInEntityViewController:self]) {
             [self.tableView insertSections:[NSIndexSet indexSetWithIndex:previousVisibleSectionIndex] withRowAnimation:UITableViewRowAnimationTop];
-        } else if (!visibleSection.isVisible && previousVisibleSection.isVisible) {
+        } else if (![visibleSection isVisibleInEntityViewController:self] && [previousVisibleSection isVisibleInEntityViewController:self]) {
             [self.tableView deleteSections:[NSIndexSet indexSetWithIndex:previousVisibleSectionIndex] withRowAnimation:UITableViewRowAnimationTop];
-        } else if (visibleSection.isVisible && previousVisibleSection.isVisible) {
+        } else if ([visibleSection isVisibleInEntityViewController:self] && [previousVisibleSection isVisibleInEntityViewController:self]) {
             if ([visibleSection isKindOfClass:[SLEntityViewControllerStaticSection class]]) {
                 SLEntityViewControllerStaticSection *staticVisibleSection = (SLEntityViewControllerStaticSection *)visibleSection;
                 SLEntityViewControllerStaticSection *previousVisibleStaticSection = (SLEntityViewControllerStaticSection *)previousVisibleSection;
@@ -1479,7 +1540,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
             }
         }
         
-        if (previousVisibleSection.isVisible) {
+        if ([previousVisibleSection isVisibleInEntityViewController:self]) {
             previousVisibleSectionIndex++;
         }
     }];

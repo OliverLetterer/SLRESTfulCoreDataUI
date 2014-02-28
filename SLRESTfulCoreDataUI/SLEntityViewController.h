@@ -36,7 +36,7 @@ typedef NS_ENUM(NSUInteger, SLEntityViewControllerEditingType) {
 
 
 
-@interface SLEntityViewControllerSection : NSObject
+@interface SLEntityViewControllerSection : NSObject <NSCopying>
 
 @property (nonatomic, copy) NSString *titleText;
 @property (nonatomic, copy) NSString *footerText;

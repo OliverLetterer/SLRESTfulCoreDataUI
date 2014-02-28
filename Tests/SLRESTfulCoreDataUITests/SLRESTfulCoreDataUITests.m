@@ -49,6 +49,7 @@ static SLEntity2 *createEntity2WithName(NSString *name)
                                             @"booleanValue": @"BOOL",
                                             @"stringValue": @"String",
                                             @"dateValue": @"Date",
+                                            @"dummyBool": @"dummy",
                                             };
 
     [UIApplication sharedApplication].delegate.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:self.viewController];
@@ -58,6 +59,7 @@ static SLEntity2 *createEntity2WithName(NSString *name)
 {
     [super tearDown];
 
+    [[UIApplication sharedApplication] sendAction:@selector(resignFirstResponder) to:nil from:nil forEvent:nil];
     [[SLTestCoreDataStack sharedInstance] wipeDataStore];
 }
 
@@ -65,8 +67,9 @@ static SLEntity2 *createEntity2WithName(NSString *name)
 {
     NSArray *attributes = @[ @"booleanValue", @"dateValue", @"stringValue" ];
     SLEntityViewControllerSection *staticSection = [SLEntityViewControllerSection staticSectionWithProperties:attributes];
+    SLEntityViewControllerSection *dummySection = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"dummyBool" ]];
 
-    self.viewController.sections = @[ staticSection ];
+    self.viewController.sections = @[ dummySection, staticSection, dummySection ];
 
     [tester waitForTimeInterval:1.0];
     [[UIApplication sharedApplication] sendAction:@selector(resignFirstResponder) to:nil from:nil forEvent:nil];
@@ -84,8 +87,9 @@ static SLEntity2 *createEntity2WithName(NSString *name)
 
     NSArray *attributes = @[ @"booleanValue", @"dateValue", @"stringValue" ];
     SLEntityViewControllerSection *staticSection = [SLEntityViewControllerSection staticSectionWithProperties:attributes];
+    SLEntityViewControllerSection *dummySection = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"dummyBool" ]];
 
-    self.viewController.sections = @[ staticSection ];
+    self.viewController.sections = @[ dummySection, staticSection, dummySection ];
 
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"booleanValue == NO"];
     [self.viewController onlyShowAttribute:@"dateValue" whenPredicateEvaluates:predicate];
@@ -109,11 +113,12 @@ static SLEntity2 *createEntity2WithName(NSString *name)
 
     SLEntityViewControllerSection *staticSection1 = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"booleanValue" ]];
     SLEntityViewControllerSection *staticSection2 = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"dateValue", @"stringValue" ]];
+    SLEntityViewControllerSection *dummySection = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"dummyBool" ]];
 
     staticSection1.titleText = @"Section 1";
     staticSection2.titleText = @"Section 1";
 
-    self.viewController.sections = @[ staticSection1, staticSection2 ];
+    self.viewController.sections = @[ dummySection, staticSection1, staticSection2, dummySection ];
 
     NSPredicate *predicate = [NSPredicate predicateWithFormat:@"booleanValue == NO"];
     [self.viewController onlyShowAttribute:@"dateValue" whenPredicateEvaluates:predicate];
@@ -139,7 +144,8 @@ static SLEntity2 *createEntity2WithName(NSString *name)
     NSArray *options = @[ @"Option 0", @"Option 1", @"Option 2", @"Option 3" ];
 
     SLEntityViewControllerSection *enumSection = [SLEntityViewControllerSection staticSectionWithEnumValue:values humanReadableOptions:options forAttribute:@"stringValue"];
-    self.viewController.sections = @[ enumSection ];
+    SLEntityViewControllerSection *dummySection = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"dummyBool" ]];
+    self.viewController.sections = @[ dummySection, enumSection, dummySection ];
 
     [tester tapViewWithAccessibilityLabel:options[0]];
     expect(self.entity.stringValue).to.equal(values[0]);
@@ -164,7 +170,8 @@ static SLEntity2 *createEntity2WithName(NSString *name)
 
     SLEntityViewControllerSection *staticSection = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"booleanValue" ]];
     SLEntityViewControllerSection *enumSection = [SLEntityViewControllerSection staticSectionWithEnumValue:values humanReadableOptions:options forAttribute:@"stringValue"];
-    self.viewController.sections = @[ staticSection, enumSection ];
+    SLEntityViewControllerSection *dummySection = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"dummyBool" ]];
+    self.viewController.sections = @[ dummySection, staticSection, enumSection, dummySection ];
 
     [tester waitForViewWithAccessibilityLabel:options[0]];
 
@@ -181,13 +188,14 @@ static SLEntity2 *createEntity2WithName(NSString *name)
                                                                                  managedObjectContext:self.context
                                                                                    sectionNameKeyPath:nil cacheName:nil];
 
+    SLEntityViewControllerSection *dummySection = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"dummyBool" ]];
     SLEntityViewControllerSection *dynamicSection = [SLEntityViewControllerSection dynamicSectionWithRelationship:@"toOneRelation" fetchedResultsController:controller formatBlock:^NSString *(SLEntity2 *entity) {
         return entity.name;
     }];
 
     dynamicSection.titleText = @"toOneRelation";
 
-    self.viewController.sections = @[ dynamicSection ];
+    self.viewController.sections = @[ dummySection, dynamicSection, dummySection ];
 
     SLEntity2 *entity1 = createEntity2WithName(@"Name 1");
     [tester waitForViewWithAccessibilityLabel:entity1.name];
@@ -214,13 +222,14 @@ static SLEntity2 *createEntity2WithName(NSString *name)
                                                                                  managedObjectContext:self.context
                                                                                    sectionNameKeyPath:nil cacheName:nil];
 
+    SLEntityViewControllerSection *dummySection = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"dummyBool" ]];
     SLEntityViewControllerSection *dynamicSection = [SLEntityViewControllerSection dynamicSectionWithRelationship:@"toManyRelation" fetchedResultsController:controller formatBlock:^NSString *(SLEntity2 *entity) {
         return entity.name;
     }];
 
     dynamicSection.titleText = @"toManyRelation";
 
-    self.viewController.sections = @[ dynamicSection ];
+    self.viewController.sections = @[ dummySection, dynamicSection, dummySection ];
 
     SLEntity2 *entity1 = createEntity2WithName(@"Name 1");
     [tester waitForViewWithAccessibilityLabel:entity1.name];
@@ -256,6 +265,7 @@ static SLEntity2 *createEntity2WithName(NSString *name)
                                                                                  managedObjectContext:self.context
                                                                                    sectionNameKeyPath:nil cacheName:nil];
 
+    SLEntityViewControllerSection *dummySection = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"dummyBool" ]];
     SLEntityViewControllerSection *staticSection = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"booleanValue" ]];
     SLEntityViewControllerSection *dynamicSection = [SLEntityViewControllerSection dynamicSectionWithRelationship:@"toOneRelation" fetchedResultsController:controller formatBlock:^NSString *(SLEntity2 *entity) {
         return entity.name;
@@ -263,7 +273,7 @@ static SLEntity2 *createEntity2WithName(NSString *name)
 
     dynamicSection.titleText = @"toOneRelation";
 
-    self.viewController.sections = @[ staticSection, dynamicSection ];
+    self.viewController.sections = @[ dummySection, staticSection, dynamicSection, dummySection ];
 
     SLEntity2 *entity1 = createEntity2WithName(@"Name 1");
     [tester waitForViewWithAccessibilityLabel:entity1.name];

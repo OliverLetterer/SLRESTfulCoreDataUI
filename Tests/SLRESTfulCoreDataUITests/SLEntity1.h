@@ -10,6 +10,8 @@
 
 @interface SLEntity1 : NSManagedObject
 
+@property (nonatomic, strong) NSNumber *dummyBool;
+
 @property (nonatomic, strong) NSNumber *booleanValue;
 @property (nonatomic, strong) NSString *stringValue;
 @property (nonatomic, strong) NSDate *dateValue;

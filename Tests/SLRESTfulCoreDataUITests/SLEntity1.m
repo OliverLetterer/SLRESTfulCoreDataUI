@@ -10,6 +10,6 @@
 
 
 @implementation SLEntity1
-@dynamic booleanValue, stringValue, dateValue, toOneRelation, toManyRelation;
+@dynamic booleanValue, stringValue, dateValue, toOneRelation, toManyRelation, dummyBool;
 
 @end
