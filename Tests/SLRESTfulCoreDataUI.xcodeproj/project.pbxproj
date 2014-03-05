@@ -16,15 +16,15 @@
 		A711F0CC18C082D0005A4100 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = A711F0CB18C082D0005A4100 /* main.m */; };
 		A711F0D018C082D0005A4100 /* SLAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = A711F0CF18C082D0005A4100 /* SLAppDelegate.m */; };
 		A711F0D218C082D0005A4100 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A711F0D118C082D0005A4100 /* Images.xcassets */; };
-		A7235F9A18C0984300D0EADE /* SLEntity2.m in Sources */ = {isa = PBXBuildFile; fileRef = A7235F9918C0984300D0EADE /* SLEntity2.m */; };
 		A7A3BC2D18C0884B00B18031 /* SenTestingKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A7A3BC2C18C0884B00B18031 /* SenTestingKit.framework */; };
 		A7A3BC2E18C0884B00B18031 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A711F0BF18C082D0005A4100 /* Foundation.framework */; };
 		A7A3BC2F18C0884B00B18031 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A711F0C318C082D0005A4100 /* UIKit.framework */; };
 		A7A3BC3518C0884B00B18031 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = A7A3BC3318C0884B00B18031 /* InfoPlist.strings */; };
 		A7A3BC3718C0884B00B18031 /* SLRESTfulCoreDataUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A3BC3618C0884B00B18031 /* SLRESTfulCoreDataUITests.m */; };
-		A7A3BC4018C08D8900B18031 /* SLTestCoreDataStack.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A3BC3F18C08D8900B18031 /* SLTestCoreDataStack.m */; };
-		A7A3BC4418C08DB900B18031 /* SLTestCoreDataStack.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = A7A3BC4218C08DB900B18031 /* SLTestCoreDataStack.xcdatamodeld */; };
-		A7A3BC4718C08E3E00B18031 /* SLEntity1.m in Sources */ = {isa = PBXBuildFile; fileRef = A7A3BC4618C08E3E00B18031 /* SLEntity1.m */; };
+		A7DE591D18C7499500BDE1A0 /* SLEntity1.m in Sources */ = {isa = PBXBuildFile; fileRef = A7DE591618C7499500BDE1A0 /* SLEntity1.m */; };
+		A7DE591E18C7499500BDE1A0 /* SLEntity2.m in Sources */ = {isa = PBXBuildFile; fileRef = A7DE591818C7499500BDE1A0 /* SLEntity2.m */; };
+		A7DE591F18C7499500BDE1A0 /* SLTestCoreDataStack.m in Sources */ = {isa = PBXBuildFile; fileRef = A7DE591A18C7499500BDE1A0 /* SLTestCoreDataStack.m */; };
+		A7DE592018C7499500BDE1A0 /* SLTestCoreDataStack.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = A7DE591B18C7499500BDE1A0 /* SLTestCoreDataStack.xcdatamodeld */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -53,19 +53,19 @@
 		A711F0CF18C082D0005A4100 /* SLAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SLAppDelegate.m; sourceTree = "<group>"; };
 		A711F0D118C082D0005A4100 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		A711F0D818C082D0005A4100 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
-		A7235F9818C0984300D0EADE /* SLEntity2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SLEntity2.h; sourceTree = "<group>"; };
-		A7235F9918C0984300D0EADE /* SLEntity2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SLEntity2.m; sourceTree = "<group>"; };
 		A7A3BC2B18C0884B00B18031 /* SLRESTfulCoreDataUITests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SLRESTfulCoreDataUITests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7A3BC2C18C0884B00B18031 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 		A7A3BC3218C0884B00B18031 /* SLRESTfulCoreDataUITests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SLRESTfulCoreDataUITests-Info.plist"; sourceTree = "<group>"; };
 		A7A3BC3418C0884B00B18031 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		A7A3BC3618C0884B00B18031 /* SLRESTfulCoreDataUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SLRESTfulCoreDataUITests.m; sourceTree = "<group>"; };
 		A7A3BC3818C0884B00B18031 /* SLRESTfulCoreDataUITests-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "SLRESTfulCoreDataUITests-Prefix.pch"; sourceTree = "<group>"; };
-		A7A3BC3E18C08D8900B18031 /* SLTestCoreDataStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SLTestCoreDataStack.h; sourceTree = "<group>"; };
-		A7A3BC3F18C08D8900B18031 /* SLTestCoreDataStack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SLTestCoreDataStack.m; sourceTree = "<group>"; };
-		A7A3BC4318C08DB900B18031 /* SLTestCoreDataStack.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SLTestCoreDataStack.xcdatamodel; sourceTree = "<group>"; };
-		A7A3BC4518C08E3E00B18031 /* SLEntity1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SLEntity1.h; sourceTree = "<group>"; };
-		A7A3BC4618C08E3E00B18031 /* SLEntity1.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SLEntity1.m; sourceTree = "<group>"; };
+		A7DE591518C7499500BDE1A0 /* SLEntity1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SLEntity1.h; sourceTree = "<group>"; };
+		A7DE591618C7499500BDE1A0 /* SLEntity1.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SLEntity1.m; sourceTree = "<group>"; };
+		A7DE591718C7499500BDE1A0 /* SLEntity2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SLEntity2.h; sourceTree = "<group>"; };
+		A7DE591818C7499500BDE1A0 /* SLEntity2.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SLEntity2.m; sourceTree = "<group>"; };
+		A7DE591918C7499500BDE1A0 /* SLTestCoreDataStack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SLTestCoreDataStack.h; sourceTree = "<group>"; };
+		A7DE591A18C7499500BDE1A0 /* SLTestCoreDataStack.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SLTestCoreDataStack.m; sourceTree = "<group>"; };
+		A7DE591C18C7499500BDE1A0 /* SLTestCoreDataStack.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SLTestCoreDataStack.xcdatamodel; sourceTree = "<group>"; };
 		CE3D98C28CA9410CBBE43805 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -133,6 +133,7 @@
 		A711F0C518C082D0005A4100 /* SLRESTfulCoreDataUI */ = {
 			isa = PBXGroup;
 			children = (
+				A7DE592118C7499A00BDE1A0 /* CoreData */,
 				A711F0CE18C082D0005A4100 /* SLAppDelegate.h */,
 				A711F0CF18C082D0005A4100 /* SLAppDelegate.m */,
 				A711F0D118C082D0005A4100 /* Images.xcassets */,
@@ -155,7 +156,6 @@
 		A7A3BC3018C0884B00B18031 /* SLRESTfulCoreDataUITests */ = {
 			isa = PBXGroup;
 			children = (
-				A7A3BC4118C08D9000B18031 /* CoreData */,
 				A7A3BC3618C0884B00B18031 /* SLRESTfulCoreDataUITests.m */,
 				A7A3BC3118C0884B00B18031 /* Supporting Files */,
 			);
@@ -172,16 +172,16 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		A7A3BC4118C08D9000B18031 /* CoreData */ = {
+		A7DE592118C7499A00BDE1A0 /* CoreData */ = {
 			isa = PBXGroup;
 			children = (
-				A7A3BC4518C08E3E00B18031 /* SLEntity1.h */,
-				A7A3BC4618C08E3E00B18031 /* SLEntity1.m */,
-				A7235F9818C0984300D0EADE /* SLEntity2.h */,
-				A7235F9918C0984300D0EADE /* SLEntity2.m */,
-				A7A3BC3E18C08D8900B18031 /* SLTestCoreDataStack.h */,
-				A7A3BC3F18C08D8900B18031 /* SLTestCoreDataStack.m */,
-				A7A3BC4218C08DB900B18031 /* SLTestCoreDataStack.xcdatamodeld */,
+				A7DE591518C7499500BDE1A0 /* SLEntity1.h */,
+				A7DE591618C7499500BDE1A0 /* SLEntity1.m */,
+				A7DE591718C7499500BDE1A0 /* SLEntity2.h */,
+				A7DE591818C7499500BDE1A0 /* SLEntity2.m */,
+				A7DE591918C7499500BDE1A0 /* SLTestCoreDataStack.h */,
+				A7DE591A18C7499500BDE1A0 /* SLTestCoreDataStack.m */,
+				A7DE591B18C7499500BDE1A0 /* SLTestCoreDataStack.xcdatamodeld */,
 			);
 			name = CoreData;
 			sourceTree = "<group>";
@@ -349,8 +349,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A7DE592018C7499500BDE1A0 /* SLTestCoreDataStack.xcdatamodeld in Sources */,
+				A7DE591E18C7499500BDE1A0 /* SLEntity2.m in Sources */,
 				A711F0CC18C082D0005A4100 /* main.m in Sources */,
 				A711F0D018C082D0005A4100 /* SLAppDelegate.m in Sources */,
+				A7DE591F18C7499500BDE1A0 /* SLTestCoreDataStack.m in Sources */,
+				A7DE591D18C7499500BDE1A0 /* SLEntity1.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -358,11 +362,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A7235F9A18C0984300D0EADE /* SLEntity2.m in Sources */,
-				A7A3BC4418C08DB900B18031 /* SLTestCoreDataStack.xcdatamodeld in Sources */,
-				A7A3BC4018C08D8900B18031 /* SLTestCoreDataStack.m in Sources */,
 				A7A3BC3718C0884B00B18031 /* SLRESTfulCoreDataUITests.m in Sources */,
-				A7A3BC4718C08E3E00B18031 /* SLEntity1.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -573,12 +573,12 @@
 /* End XCConfigurationList section */
 
 /* Begin XCVersionGroup section */
-		A7A3BC4218C08DB900B18031 /* SLTestCoreDataStack.xcdatamodeld */ = {
+		A7DE591B18C7499500BDE1A0 /* SLTestCoreDataStack.xcdatamodeld */ = {
 			isa = XCVersionGroup;
 			children = (
-				A7A3BC4318C08DB900B18031 /* SLTestCoreDataStack.xcdatamodel */,
+				A7DE591C18C7499500BDE1A0 /* SLTestCoreDataStack.xcdatamodel */,
 			);
-			currentVersion = A7A3BC4318C08DB900B18031 /* SLTestCoreDataStack.xcdatamodel */;
+			currentVersion = A7DE591C18C7499500BDE1A0 /* SLTestCoreDataStack.xcdatamodel */;
 			path = SLTestCoreDataStack.xcdatamodeld;
 			sourceTree = "<group>";
 			versionGroupType = wrapper.xcdatamodel;
