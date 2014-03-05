@@ -46,6 +46,8 @@ static NSString *capitalizedString(NSString *string)
 
 
 @interface SLEntityViewControllerSection ()
+@property (nonatomic, assign) NSInteger index;
+@property (nonatomic, assign) BOOL isExpanded;
 @property (nonatomic, strong) NSNumber *lastVisibility;
 - (BOOL)isVisibleInEntityViewController:(SLEntityViewController *)viewController;
 @end
@@ -107,6 +109,9 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     SLEntityViewControllerSection *section = [[self.class alloc] init];
     section.titleText = self.titleText;
     section.footerText = self.footerText;
+    section.isExpandable = self.isExpandable;
+    section.isExpanded = self.isExpanded;
+    section.index = self.index;
     return section;
 }
 
@@ -339,6 +344,10 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
     _sections = [sections copy];
 
+    [_sections enumerateObjectsUsingBlock:^(SLEntityViewControllerSection *section, NSUInteger idx, BOOL *stop) {
+        section.index = idx;
+    }];
+
     for (id section in _sections) {
         if ([section isKindOfClass:[SLEntityViewControllerDynamicSection class]]) {
             SLEntityViewControllerDynamicSection *dynamicSection = section;
@@ -454,12 +463,6 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     }
 }
 
-- (void)viewDidUnload
-{
-    [super viewDidUnload];
-
-}
-
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
@@ -506,36 +509,6 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     }
 }
 
-- (void)viewWillDisappear:(BOOL)animated
-{
-    [super viewWillDisappear:animated];
-
-}
-
-- (void)viewDidDisappear:(BOOL)animated
-{
-    [super viewDidDisappear:animated];
-
-}
-
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        return YES;
-    } else {
-        return (interfaceOrientation == UIInterfaceOrientationPortrait);
-    }
-}
-
-- (NSUInteger)supportedInterfaceOrientations
-{
-    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
-        return UIInterfaceOrientationMaskAll;
-    } else {
-        return UIInterfaceOrientationMaskPortrait;
-    }
-}
-
 #pragma mark - UITableViewDataSource
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView
@@ -558,7 +531,11 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerStaticEnumSection class]]) {
         SLEntityViewControllerStaticEnumSection *staticSection = sectionInfo;
 
-        return staticSection.values.count;
+        if (staticSection.isExpandable) {
+            return staticSection.isExpanded ? staticSection.values.count + 1 : 1;
+        } else {
+            return staticSection.values.count;
+        }
     }
 
     NSParameterAssert(NO);
@@ -581,25 +558,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
             return [self tableView:tableView cellForRelationshipDescription:propertyDescription atIndexPath:indexPath];
         }
     } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerStaticEnumSection class]]) {
-        SLEntityViewControllerStaticEnumSection *staticSection = sectionInfo;
-
-        static NSString *CellIdentifier = @"SLEntityTableViewCellStaticEnum";
-
-        SLEntityTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-        if (cell == nil) {
-            cell = [[SLEntityTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
-        }
-
-        cell.textLabel.text = staticSection.humanReadableOptions[indexPath.row];
-        id currentValue = [self.entity valueForKey:staticSection.attribute];
-
-        if ([currentValue isEqual:staticSection.values[indexPath.row]]) {
-            cell.accessoryType = UITableViewCellAccessoryCheckmark;
-        } else {
-            cell.accessoryType = UITableViewCellAccessoryNone;
-        }
-
-        return cell;
+        return [self _tableView:tableView cellForStaticEnumSection:sectionInfo atIndexPath:indexPath];
     } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerDynamicSection class]]) {
         SLEntityViewControllerDynamicSection *dynamicSection = sectionInfo;
 
@@ -628,38 +587,6 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     NSAssert(NO, @"no cell for %@", indexPath);
     return nil;
 }
-
-// Override to support conditional editing of the table view.
-//- (BOOL)tableView:(UITableView *)tableView canEditRowAtIndexPath:(NSIndexPath *)indexPath
-//{
-//    // Return NO if you do not want the specified item to be editable.
-//    return YES;
-//}
-
-// Override to support editing the table view.
-//- (void)tableView:(UITableView *)tableView commitEditingStyle:(UITableViewCellEditingStyle)editingStyle forRowAtIndexPath:(NSIndexPath *)indexPath
-//{
-//    if (editingStyle == UITableViewCellEditingStyleDelete) {
-//        // Delete the row from the data source
-//        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
-//    }
-//    else if (editingStyle == UITableViewCellEditingStyleInsert) {
-//        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-//    }
-//}
-
-// Override to support rearranging the table view.
-//- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
-//{
-//
-//}
-
-// Override to support conditional rearranging of the table view.
-//- (BOOL)tableView:(UITableView *)tableView canMoveRowAtIndexPath:(NSIndexPath *)indexPath
-//{
-//    // Return NO if you do not want the item to be re-orderable.
-//    return YES;
-//}
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section
 {
@@ -821,13 +748,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
                           withRowAnimation:UITableViewRowAnimationNone];
         }
     } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerStaticEnumSection class]]) {
-        SLEntityViewControllerStaticEnumSection *staticSection = sectionInfo;
-
-        [self.entity setValue:staticSection.values[indexPath.row] forKey:staticSection.attribute];
-        [self _updateVisibleSectionsAnimated:YES];
-
-        [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:[self indexPathForProperty:staticSection.attribute].section]
-                      withRowAnimation:UITableViewRowAnimationNone];
+        [self _tableView:tableView didSelectRowInEnumSection:sectionInfo atIndexPath:indexPath];
     }
 
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
@@ -1312,47 +1233,6 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     }
 }
 
-#pragma mark - UIViewControllerRestoration
-
-+ (UIViewController *)viewControllerWithRestorationIdentifierPath:(NSArray *)identifierComponents coder:(NSCoder *)coder
-{
-    return [[self alloc] init];
-}
-
-#pragma mark - UIStateRestoration
-
-- (void)encodeRestorableStateWithCoder:(NSCoder *)coder
-{
-    [super encodeRestorableStateWithCoder:coder];
-
-}
-
-- (void)decodeRestorableStateWithCoder:(NSCoder *)coder
-{
-    [super decodeRestorableStateWithCoder:coder];
-
-}
-
-#pragma mark - UIDataSourceModelAssociation
-
-- (NSString *)modelIdentifierForElementAtIndexPath:(NSIndexPath *)indexPath inView:(UIView *)view
-{
-    if (indexPath) {
-
-    }
-
-    return nil;
-}
-
-- (NSIndexPath *)indexPathForElementWithModelIdentifier:(NSString *)identifier inView:(UIView *)view
-{
-    if (identifier) {
-
-    }
-
-    return nil;
-}
-
 #pragma mark - SLSelectEnumAttributeViewControllerDelegate
 
 - (void)selectEnumAttributeViewController:(SLSelectEnumAttributeViewController *)viewController didSelectEnumValue:(id)enumValue
@@ -1413,7 +1293,151 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     }
 }
 
+#pragma mark - _UITableViewDataSource
+
+- (UITableViewCell *)_tableView:(UITableView *)tableView cellForStaticEnumSection:(SLEntityViewControllerStaticEnumSection *)staticSection atIndexPath:(NSIndexPath *)indexPath
+{
+    if (staticSection.isExpandable) {
+        if (indexPath.row == 0) {
+            static NSString *CellIdentifier = @"SLEntityTableViewCellUITableViewCellStyleValue1StaticEnumSection";
+
+            SLEntityTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+            if (cell == nil) {
+                cell = [[SLEntityTableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
+            }
+
+            cell.textLabel.text = self.propertyMapping[staticSection.attribute];
+
+            NSInteger index = [staticSection.values indexOfObject:[self.entity valueForKey:staticSection.attribute]];
+            
+            if (index != NSNotFound) {
+                cell.detailTextLabel.text = staticSection.humanReadableOptions[index];
+            } else {
+                cell.detailTextLabel.text = nil;
+            }
+
+            cell.accessibilityLabel = cell.textLabel.text;
+
+            return cell;
+        }
+
+        static NSString *CellIdentifier = @"SLEntityTableViewCellStaticEnumSection";
+
+        SLEntityTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+        if (cell == nil) {
+            cell = [[SLEntityTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        }
+
+        cell.textLabel.text = staticSection.humanReadableOptions[indexPath.row - 1];
+        id currentValue = [self.entity valueForKey:staticSection.attribute];
+
+        if ([currentValue isEqual:staticSection.values[indexPath.row - 1]]) {
+            cell.accessoryType = UITableViewCellAccessoryCheckmark;
+        } else {
+            cell.accessoryType = UITableViewCellAccessoryNone;
+        }
+
+        cell.accessibilityLabel = cell.textLabel.text;
+        
+        return cell;
+    } else {
+        static NSString *CellIdentifier = @"SLEntityTableViewCellStaticEnumSection";
+
+        SLEntityTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+        if (cell == nil) {
+            cell = [[SLEntityTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+        }
+
+        cell.textLabel.text = staticSection.humanReadableOptions[indexPath.row];
+        id currentValue = [self.entity valueForKey:staticSection.attribute];
+
+        if ([currentValue isEqual:staticSection.values[indexPath.row]]) {
+            cell.accessoryType = UITableViewCellAccessoryCheckmark;
+        } else {
+            cell.accessoryType = UITableViewCellAccessoryNone;
+        }
+
+        cell.accessibilityLabel = cell.textLabel.text;
+        
+        return cell;
+    }
+
+    return nil;
+}
+
+#pragma mark - _UITableViewDelegate
+
+- (void)_tableView:(UITableView *)tableView didSelectRowInEnumSection:(SLEntityViewControllerStaticEnumSection *)staticSection atIndexPath:(NSIndexPath *)indexPath
+{
+    SLEntityViewControllerSection *originalSection = self.sections[staticSection.index];
+
+    if (staticSection.isExpandable) {
+        if (indexPath.row == 0) {
+            if (staticSection.isExpanded) {
+                staticSection.isExpanded = NO;
+                originalSection.isExpanded = NO;
+
+                NSMutableArray *deletedIndexPaths = [NSMutableArray array];
+                for (int i = 1; i <= staticSection.values.count; i++) {
+                    [deletedIndexPaths addObject:[NSIndexPath indexPathForRow:i inSection:indexPath.section]];
+                }
+                [self.tableView deleteRowsAtIndexPaths:deletedIndexPaths withRowAnimation:UITableViewRowAnimationBottom];
+            } else {
+                staticSection.isExpanded = YES;
+                originalSection.isExpanded = YES;
+
+                NSMutableArray *insertedIndexPaths = [NSMutableArray array];
+                for (int i = 1; i <= staticSection.values.count; i++) {
+                    [insertedIndexPaths addObject:[NSIndexPath indexPathForRow:i inSection:indexPath.section]];
+                }
+                [self.tableView insertRowsAtIndexPaths:insertedIndexPaths withRowAnimation:UITableViewRowAnimationBottom];
+            }
+        } else {
+            NSString *selectedValue = staticSection.values[indexPath.row - 1];
+            NSString *selectedOption = staticSection.humanReadableOptions[indexPath.row - 1];
+
+            [tableView deselectRowAtIndexPath:indexPath animated:NO];
+            [self _removeCheckmarksInSection:indexPath.section];
+
+            [tableView cellForRowAtIndexPath:indexPath].accessoryType = UITableViewCellAccessoryCheckmark;
+            [tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:indexPath.section]].detailTextLabel.text = selectedOption;
+
+            staticSection.isExpanded = NO;
+            originalSection.isExpanded = NO;
+            [self.entity setValue:selectedValue forKey:staticSection.attribute];
+
+            NSMutableArray *deletedIndexPaths = [NSMutableArray array];
+            for (int i = 1; i <= staticSection.values.count; i++) {
+                [deletedIndexPaths addObject:[NSIndexPath indexPathForRow:i inSection:indexPath.section]];
+            }
+            [self.tableView deleteRowsAtIndexPaths:deletedIndexPaths withRowAnimation:UITableViewRowAnimationBottom];
+            
+            [self _updateVisibleSectionsAnimated:YES];
+        }
+    } else {
+        [self.entity setValue:staticSection.values[indexPath.row] forKey:staticSection.attribute];
+        [self _updateVisibleSectionsAnimated:YES];
+
+        [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:[self indexPathForProperty:staticSection.attribute].section]
+                      withRowAnimation:UITableViewRowAnimationNone];
+    }
+}
+
 #pragma mark - Private category implementation ()
+
+- (void)_removeCheckmarksInSection:(NSInteger)section
+{
+    for (NSIndexPath *indexPath in self.tableView.indexPathsForVisibleRows) {
+        if (!indexPath.section == section) {
+            continue;
+        }
+
+        UITableViewCell *cell = [self.tableView cellForRowAtIndexPath:indexPath];
+        if (cell.accessoryType == UITableViewCellAccessoryCheckmark) {
+            cell.accessoryType = UITableViewCellAccessoryNone;
+        }
+    }
+}
 
 - (void)_textFieldEditingChanged:(UITextField *)sender
 {

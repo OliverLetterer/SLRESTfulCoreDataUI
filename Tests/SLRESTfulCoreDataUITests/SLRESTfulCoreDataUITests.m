@@ -173,10 +173,10 @@ static SLEntity2 *createEntity2WithName(NSString *name)
     SLEntityViewControllerSection *dummySection = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"dummyBool" ]];
     self.viewController.sections = @[ dummySection, staticSection, enumSection, dummySection ];
 
-    [tester waitForViewWithAccessibilityLabel:options[0]];
+    [tester waitForViewWithAccessibilityLabel:options.firstObject];
 
     [tester setOn:YES forSwitchWithAccessibilityLabel:@"BOOL"];
-    [tester waitForAbsenceOfViewWithAccessibilityLabel:options[0]];
+    [tester waitForAbsenceOfViewWithAccessibilityLabel:options.firstObject];
 }
 
 - (void)testThatSLEntityViewControllerCanDislayDynamicSectionForToOneRelationships
@@ -283,6 +283,38 @@ static SLEntity2 *createEntity2WithName(NSString *name)
 
     [tester setOn:YES forSwitchWithAccessibilityLabel:@"BOOL"];
     [tester waitForAbsenceOfViewWithAccessibilityLabel:entity1.name];
+}
+
+- (void)testThatSLEntityViewControllerCanDisplayACollapsableEnumSection
+{
+    NSArray *values = @[ @"value 0", @"value 1", @"value 2", @"value 3" ];
+    NSArray *options = @[ @"Option 0", @"Option 1", @"Option 2", @"Option 3" ];
+
+    self.entity.stringValue = values.firstObject;
+
+    [self.viewController onlyShowAttribute:@"booleanValue" whenPredicateEvaluates:[NSPredicate predicateWithBlock:^BOOL(SLEntity1 *evaluatedObject, NSDictionary *bindings) {
+        return [evaluatedObject.stringValue isEqualToString:values.firstObject];
+    }]];
+
+    SLEntityViewControllerSection *enumSection = [SLEntityViewControllerSection staticSectionWithEnumValue:values humanReadableOptions:options forAttribute:@"stringValue"];
+    enumSection.isExpandable = YES;
+
+    SLEntityViewControllerSection *staticSection = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"booleanValue" ]];
+    self.viewController.sections = @[ enumSection, staticSection ];
+
+    [tester waitForViewWithAccessibilityLabel:@"String"];
+    [tester waitForAbsenceOfViewWithAccessibilityLabel:options[1]];
+
+    [tester tapViewWithAccessibilityLabel:@"String"];
+    [tester waitForViewWithAccessibilityLabel:options[2]];
+    [tester setOn:YES forSwitchWithAccessibilityLabel:@"BOOL"];
+
+    [tester tapViewWithAccessibilityLabel:options[1]];
+    [tester waitForAbsenceOfViewWithAccessibilityLabel:options[2]];
+    [tester waitForAbsenceOfViewWithAccessibilityLabel:@"BOOL"];
+
+    expect(self.entity.stringValue).to.equal(values[1]);
+    expect(self.entity.booleanValue).to.beTruthy();
 }
 
 @end

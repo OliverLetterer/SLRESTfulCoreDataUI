@@ -7,6 +7,10 @@
 //
 
 #import "SLAppDelegate.h"
+#import "SLEntity1.h"
+#import "SLTestCoreDataStack.h"
+
+#import <SLEntityViewController.h>
 
 @implementation SLAppDelegate
 
@@ -15,9 +19,35 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.backgroundColor = [UIColor whiteColor];
 
-    UIViewController *dummyViewController = [[UIViewController alloc] init];
-    self.window.rootViewController = dummyViewController;
-    
+    NSManagedObjectContext *context = [SLTestCoreDataStack sharedInstance].mainThreadManagedObjectContext;
+    SLEntity1 *entity = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass([SLEntity1 class])
+                                                      inManagedObjectContext:context];
+
+    SLEntityViewController *viewController = [[SLEntityViewController alloc] initWithEntity:entity editingType:SLEntityViewControllerEditingTypeCreate];
+    viewController.propertyMapping = @{
+                                       @"booleanValue": @"BOOL",
+                                       @"stringValue": @"String",
+                                       @"dateValue": @"Date",
+                                       @"dummyBool": @"dummy",
+                                       };
+
+    NSArray *values = @[ @"value 0", @"value 1", @"value 2", @"value 3" ];
+    NSArray *options = @[ @"Option 0", @"Option 1", @"Option 2", @"Option 3" ];
+
+    entity.stringValue = values.firstObject;
+
+    SLEntityViewControllerSection *enumSection = [SLEntityViewControllerSection staticSectionWithEnumValue:values humanReadableOptions:options forAttribute:@"stringValue"];
+    enumSection.isExpandable = YES;
+
+    SLEntityViewControllerSection *staticSection = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"booleanValue" ]];
+    viewController.sections = @[ enumSection, staticSection ];
+
+    [viewController onlyShowAttribute:@"booleanValue" whenPredicateEvaluates:[NSPredicate predicateWithBlock:^BOOL(SLEntity1 *evaluatedObject, NSDictionary *bindings) {
+        return [evaluatedObject.stringValue isEqualToString:values.firstObject];
+    }]];
+
+    self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:viewController];
+
     [self.window makeKeyAndVisible];
     return YES;
 }
@@ -30,7 +60,7 @@
 
 - (void)applicationDidEnterBackground:(UIApplication *)application
 {
-    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later. 
+    // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
     // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
 }
 

@@ -41,6 +41,8 @@ typedef NS_ENUM(NSUInteger, SLEntityViewControllerEditingType) {
 @property (nonatomic, copy) NSString *titleText;
 @property (nonatomic, copy) NSString *footerText;
 
+@property (nonatomic, assign) BOOL isExpandable;
+
 + (instancetype)staticSectionWithProperties:(NSArray *)properties;
 
 + (instancetype)staticSectionWithEnumValue:(NSArray *)enumValues humanReadableOptions:(NSArray *)humanReadableOptions forAttribute:(NSString *)attribute;
