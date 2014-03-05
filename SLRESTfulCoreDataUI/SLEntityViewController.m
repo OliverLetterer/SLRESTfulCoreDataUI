@@ -527,15 +527,19 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerDynamicSection class]]) {
         SLEntityViewControllerDynamicSection *dynamicSection = sectionInfo;
 
+        if (dynamicSection.isExpandable) {
+            return dynamicSection.isExpanded ? dynamicSection.fetchedResultsController.fetchedObjects.count + 1 : 1;
+        }
+
         return dynamicSection.fetchedResultsController.fetchedObjects.count;
     } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerStaticEnumSection class]]) {
         SLEntityViewControllerStaticEnumSection *staticSection = sectionInfo;
 
         if (staticSection.isExpandable) {
             return staticSection.isExpanded ? staticSection.values.count + 1 : 1;
-        } else {
-            return staticSection.values.count;
         }
+
+        return staticSection.values.count;
     }
 
     NSParameterAssert(NO);
@@ -560,28 +564,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerStaticEnumSection class]]) {
         return [self _tableView:tableView cellForStaticEnumSection:sectionInfo atIndexPath:indexPath];
     } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerDynamicSection class]]) {
-        SLEntityViewControllerDynamicSection *dynamicSection = sectionInfo;
-
-        static NSString *CellIdentifier = @"SLEntityTableViewCellDynamicSection";
-
-        SLEntityTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-        if (cell == nil) {
-            cell = [[SLEntityTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
-        }
-
-        NSManagedObject *thisEntity = dynamicSection.fetchedResultsController.fetchedObjects[indexPath.row];
-        cell.textLabel.text = dynamicSection.formatBlock(thisEntity);
-
-        NSRelationshipDescription *relationshipDescription = self.entityDescription.relationshipsByName[dynamicSection.relationship];
-
-        if (relationshipDescription.isToMany) {
-            NSSet *set = [self.entity valueForKey:relationshipDescription.name];
-            cell.accessoryType = [set containsObject:thisEntity] ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
-        } else {
-            cell.accessoryType = thisEntity == [self.entity valueForKey:relationshipDescription.name] ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
-        }
-
-        return cell;
+        return [self _tableView:tableView cellForDynamicSection:sectionInfo atIndexPath:indexPath];
     }
 
     NSAssert(NO, @"no cell for %@", indexPath);
@@ -721,32 +704,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
             return;
         }
     } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerDynamicSection class]]) {
-        SLEntityViewControllerDynamicSection *dynamicSection = sectionInfo;
-
-        NSManagedObject *thisEntity = dynamicSection.fetchedResultsController.fetchedObjects[indexPath.row];
-        NSRelationshipDescription *relationshipDescription = self.entityDescription.relationshipsByName[dynamicSection.relationship];
-
-        if (relationshipDescription.isToMany) {
-            NSSet *set = [self.entity valueForKey:relationshipDescription.name];
-            SEL addOrDeleteSelector = NULL;
-
-            if ([set containsObject:thisEntity]) {
-                addOrDeleteSelector = NSSelectorFromString([NSString stringWithFormat:@"remove%@Object:", capitalizedString(relationshipDescription.name)]);
-            } else {
-                addOrDeleteSelector = NSSelectorFromString([NSString stringWithFormat:@"add%@Object:", capitalizedString(relationshipDescription.name)]);
-            }
-
-            ((void(*)(id, SEL, ...))objc_msgSend)(self.entity, addOrDeleteSelector, thisEntity);
-
-            [self _updateVisibleSectionsAnimated:YES];
-            [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:[self indexPathForProperty:relationshipDescription.name].section]
-                          withRowAnimation:UITableViewRowAnimationNone];
-        } else {
-            [self.entity setValue:thisEntity forKey:relationshipDescription.name];
-            [self _updateVisibleSectionsAnimated:YES];
-            [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:[self indexPathForProperty:relationshipDescription.name].section]
-                          withRowAnimation:UITableViewRowAnimationNone];
-        }
+        [self _tableView:tableView didSelectRowInDynamicSection:sectionInfo atIndexPath:indexPath];
     } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerStaticEnumSection class]]) {
         [self _tableView:tableView didSelectRowInEnumSection:sectionInfo atIndexPath:indexPath];
     }
@@ -951,13 +909,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     }
 
     cell.textLabel.text = self.propertyMapping[relationshipDescription.name];
-
-    if (relationshipDescription.isToMany) {
-        cell.detailTextLabel.text = [NSString stringWithFormat:NSLocalizedString(@"%d selected", @""), [[self.entity valueForKey:relationshipDescription.name] count]];
-    } else {
-        NSString *nameKeyPath = [self nameKeyPathForRelationship:relationshipDescription.name];
-        cell.detailTextLabel.text = [[self.entity valueForKey:relationshipDescription.name] valueForKey:nameKeyPath];
-    }
+    cell.detailTextLabel.text = [self _detailedTextForRelationship:relationshipDescription.name];
 
     if (canEditProperty) {
         cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
@@ -1272,10 +1224,19 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     }
 
     SLEntityViewControllerDynamicSection *section = self.currentlyVisibleSectionsInTableView[index];
+    if (section.isExpandable && !section.isExpanded) {
+        return;
+    }
+    
     NSUInteger sectionIndex = [self indexPathForProperty:section.relationship].section;
 
-    NSIndexPath *updatedIndexPath = [NSIndexPath indexPathForRow:indexPath.row inSection:sectionIndex];
-    NSIndexPath *updatedNewIndexPath = [NSIndexPath indexPathForRow:newIndexPath.row inSection:sectionIndex];
+    NSInteger rowOffset = 0;
+    if (section.isExpandable) {
+        rowOffset = 1;
+    }
+
+    NSIndexPath *updatedIndexPath = [NSIndexPath indexPathForRow:indexPath.row + rowOffset inSection:sectionIndex];
+    NSIndexPath *updatedNewIndexPath = [NSIndexPath indexPathForRow:newIndexPath.row + rowOffset inSection:sectionIndex];
 
     switch (type) {
         case NSFetchedResultsChangeDelete:
@@ -1297,6 +1258,8 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (UITableViewCell *)_tableView:(UITableView *)tableView cellForStaticEnumSection:(SLEntityViewControllerStaticEnumSection *)staticSection atIndexPath:(NSIndexPath *)indexPath
 {
+    NSInteger modelIndex = indexPath.row;
+
     if (staticSection.isExpandable) {
         if (indexPath.row == 0) {
             static NSString *CellIdentifier = @"SLEntityTableViewCellUITableViewCellStyleValue1StaticEnumSection";
@@ -1321,48 +1284,73 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
             return cell;
         }
 
-        static NSString *CellIdentifier = @"SLEntityTableViewCellStaticEnumSection";
-
-        SLEntityTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-        if (cell == nil) {
-            cell = [[SLEntityTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
-        }
-
-        cell.textLabel.text = staticSection.humanReadableOptions[indexPath.row - 1];
-        id currentValue = [self.entity valueForKey:staticSection.attribute];
-
-        if ([currentValue isEqual:staticSection.values[indexPath.row - 1]]) {
-            cell.accessoryType = UITableViewCellAccessoryCheckmark;
-        } else {
-            cell.accessoryType = UITableViewCellAccessoryNone;
-        }
-
-        cell.accessibilityLabel = cell.textLabel.text;
-        
-        return cell;
-    } else {
-        static NSString *CellIdentifier = @"SLEntityTableViewCellStaticEnumSection";
-
-        SLEntityTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
-        if (cell == nil) {
-            cell = [[SLEntityTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
-        }
-
-        cell.textLabel.text = staticSection.humanReadableOptions[indexPath.row];
-        id currentValue = [self.entity valueForKey:staticSection.attribute];
-
-        if ([currentValue isEqual:staticSection.values[indexPath.row]]) {
-            cell.accessoryType = UITableViewCellAccessoryCheckmark;
-        } else {
-            cell.accessoryType = UITableViewCellAccessoryNone;
-        }
-
-        cell.accessibilityLabel = cell.textLabel.text;
-        
-        return cell;
+        modelIndex = modelIndex - 1;
     }
 
-    return nil;
+    static NSString *CellIdentifier = @"SLEntityTableViewCellStaticEnumSection";
+
+    SLEntityTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    if (cell == nil) {
+        cell = [[SLEntityTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+    }
+
+    cell.textLabel.text = staticSection.humanReadableOptions[modelIndex];
+    id currentValue = [self.entity valueForKey:staticSection.attribute];
+
+    if ([currentValue isEqual:staticSection.values[modelIndex]]) {
+        cell.accessoryType = UITableViewCellAccessoryCheckmark;
+    } else {
+        cell.accessoryType = UITableViewCellAccessoryNone;
+    }
+
+    cell.accessibilityLabel = cell.textLabel.text;
+
+    return cell;
+}
+
+- (UITableViewCell *)_tableView:(UITableView *)tableView cellForDynamicSection:(SLEntityViewControllerDynamicSection *)dynamicSection atIndexPath:(NSIndexPath *)indexPath
+{
+    NSInteger modelIndex = indexPath.row;
+
+    if (dynamicSection.isExpandable) {
+        if (indexPath.row == 0) {
+            static NSString *CellIdentifier = @"SLEntityTableViewCellUITableViewCellStyleValue1DynamicSection";
+
+            SLEntityTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+            if (cell == nil) {
+                cell = [[SLEntityTableViewCell alloc] initWithStyle:UITableViewCellStyleValue1 reuseIdentifier:CellIdentifier];
+            }
+
+            cell.textLabel.text = self.propertyMapping[dynamicSection.relationship];
+            cell.detailTextLabel.text = [self _detailedTextForRelationship:dynamicSection.relationship];
+            cell.accessibilityLabel = cell.textLabel.text;
+            
+            return cell;
+        }
+
+        modelIndex = modelIndex - 1;
+    }
+
+    static NSString *CellIdentifier = @"SLEntityTableViewCellDynamicSection";
+
+    SLEntityTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
+    if (cell == nil) {
+        cell = [[SLEntityTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
+    }
+
+    NSManagedObject *thisEntity = dynamicSection.fetchedResultsController.fetchedObjects[modelIndex];
+    cell.textLabel.text = dynamicSection.formatBlock(thisEntity);
+
+    NSRelationshipDescription *relationshipDescription = self.entityDescription.relationshipsByName[dynamicSection.relationship];
+
+    if (relationshipDescription.isToMany) {
+        NSSet *set = [self.entity valueForKey:relationshipDescription.name];
+        cell.accessoryType = [set containsObject:thisEntity] ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+    } else {
+        cell.accessoryType = thisEntity == [self.entity valueForKey:relationshipDescription.name] ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+    }
+
+    return cell;
 }
 
 #pragma mark - _UITableViewDelegate
@@ -1370,6 +1358,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 - (void)_tableView:(UITableView *)tableView didSelectRowInEnumSection:(SLEntityViewControllerStaticEnumSection *)staticSection atIndexPath:(NSIndexPath *)indexPath
 {
     SLEntityViewControllerSection *originalSection = self.sections[staticSection.index];
+    NSInteger modelIndex = indexPath.row;
 
     if (staticSection.isExpandable) {
         if (indexPath.row == 0) {
@@ -1392,38 +1381,149 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
                 }
                 [self.tableView insertRowsAtIndexPaths:insertedIndexPaths withRowAnimation:UITableViewRowAnimationBottom];
             }
+
+            return;
         } else {
-            NSString *selectedValue = staticSection.values[indexPath.row - 1];
-            NSString *selectedOption = staticSection.humanReadableOptions[indexPath.row - 1];
-
-            [tableView deselectRowAtIndexPath:indexPath animated:NO];
-            [self _removeCheckmarksInSection:indexPath.section];
-
-            [tableView cellForRowAtIndexPath:indexPath].accessoryType = UITableViewCellAccessoryCheckmark;
-            [tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:indexPath.section]].detailTextLabel.text = selectedOption;
-
-            staticSection.isExpanded = NO;
-            originalSection.isExpanded = NO;
-            [self.entity setValue:selectedValue forKey:staticSection.attribute];
-
-            NSMutableArray *deletedIndexPaths = [NSMutableArray array];
-            for (int i = 1; i <= staticSection.values.count; i++) {
-                [deletedIndexPaths addObject:[NSIndexPath indexPathForRow:i inSection:indexPath.section]];
-            }
-            [self.tableView deleteRowsAtIndexPaths:deletedIndexPaths withRowAnimation:UITableViewRowAnimationBottom];
-            
-            [self _updateVisibleSectionsAnimated:YES];
+            modelIndex = modelIndex - 1;
         }
-    } else {
-        [self.entity setValue:staticSection.values[indexPath.row] forKey:staticSection.attribute];
-        [self _updateVisibleSectionsAnimated:YES];
+    }
 
+    if (staticSection.isExpandable) {
+        [tableView deselectRowAtIndexPath:indexPath animated:NO];
+        [self _removeCheckmarksInSection:indexPath.section];
+
+        [tableView cellForRowAtIndexPath:indexPath].accessoryType = UITableViewCellAccessoryCheckmark;
+        [tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:indexPath.section]].detailTextLabel.text = staticSection.humanReadableOptions[modelIndex];
+
+        staticSection.isExpanded = NO;
+        originalSection.isExpanded = NO;
+    }
+
+    [self.entity setValue:staticSection.values[modelIndex] forKey:staticSection.attribute];
+
+    if (staticSection.isExpandable) {
+        NSMutableArray *deletedIndexPaths = [NSMutableArray array];
+        for (int i = 1; i <= staticSection.values.count; i++) {
+            [deletedIndexPaths addObject:[NSIndexPath indexPathForRow:i inSection:indexPath.section]];
+        }
+        [self.tableView deleteRowsAtIndexPaths:deletedIndexPaths withRowAnimation:UITableViewRowAnimationBottom];
+    }
+
+    [self _updateVisibleSectionsAnimated:YES];
+
+    if (!staticSection.isExpandable) {
         [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:[self indexPathForProperty:staticSection.attribute].section]
                       withRowAnimation:UITableViewRowAnimationNone];
     }
 }
 
+- (void)_tableView:(UITableView *)tableView didSelectRowInDynamicSection:(SLEntityViewControllerDynamicSection *)dynamicSection atIndexPath:(NSIndexPath *)indexPath
+{
+    SLEntityViewControllerSection *originalSection = self.sections[dynamicSection.index];
+    NSInteger modelIndex = indexPath.row;
+
+    if (dynamicSection.isExpandable) {
+        if (indexPath.row == 0) {
+            if (dynamicSection.isExpanded) {
+                dynamicSection.isExpanded = NO;
+                originalSection.isExpanded = NO;
+
+                NSMutableArray *deletedIndexPaths = [NSMutableArray array];
+                for (int i = 1; i <= dynamicSection.fetchedResultsController.fetchedObjects.count; i++) {
+                    [deletedIndexPaths addObject:[NSIndexPath indexPathForRow:i inSection:indexPath.section]];
+                }
+                [self.tableView deleteRowsAtIndexPaths:deletedIndexPaths withRowAnimation:UITableViewRowAnimationBottom];
+            } else {
+                dynamicSection.isExpanded = YES;
+                originalSection.isExpanded = YES;
+
+                NSMutableArray *insertedIndexPaths = [NSMutableArray array];
+                for (int i = 1; i <= dynamicSection.fetchedResultsController.fetchedObjects.count; i++) {
+                    [insertedIndexPaths addObject:[NSIndexPath indexPathForRow:i inSection:indexPath.section]];
+                }
+                [self.tableView insertRowsAtIndexPaths:insertedIndexPaths withRowAnimation:UITableViewRowAnimationBottom];
+            }
+
+            return;
+        } else {
+            modelIndex = modelIndex - 1;
+        }
+    }
+
+    NSManagedObject *thisEntity = dynamicSection.fetchedResultsController.fetchedObjects[modelIndex];
+    NSRelationshipDescription *relationshipDescription = self.entityDescription.relationshipsByName[dynamicSection.relationship];
+
+    if (relationshipDescription.isToMany) {
+        NSSet *set = [self.entity valueForKey:relationshipDescription.name];
+        SEL addOrDeleteSelector = NULL;
+
+        if ([set containsObject:thisEntity]) {
+            addOrDeleteSelector = NSSelectorFromString([NSString stringWithFormat:@"remove%@Object:", capitalizedString(relationshipDescription.name)]);
+        } else {
+            addOrDeleteSelector = NSSelectorFromString([NSString stringWithFormat:@"add%@Object:", capitalizedString(relationshipDescription.name)]);
+        }
+
+        ((void(*)(id, SEL, id))objc_msgSend)(self.entity, addOrDeleteSelector, thisEntity);
+
+        if (dynamicSection.isExpandable) {
+            [tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:indexPath.section]].detailTextLabel.text = [self _detailedTextForRelationship:relationshipDescription.name];
+        }
+
+        [self _updateVisibleSectionsAnimated:YES];
+    } else {
+        [self.entity setValue:thisEntity forKey:relationshipDescription.name];
+        
+        if (dynamicSection.isExpandable) {
+            dynamicSection.isExpanded = NO;
+            originalSection.isExpanded = NO;
+
+            [tableView deselectRowAtIndexPath:indexPath animated:NO];
+            [self _removeCheckmarksInSection:indexPath.section];
+
+            [tableView cellForRowAtIndexPath:indexPath].accessoryType = UITableViewCellAccessoryCheckmark;
+            [tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:indexPath.section]].detailTextLabel.text = [self _detailedTextForRelationship:relationshipDescription.name];
+
+            NSMutableArray *deletedIndexPaths = [NSMutableArray array];
+            for (int i = 1; i <= dynamicSection.fetchedResultsController.fetchedObjects.count; i++) {
+                [deletedIndexPaths addObject:[NSIndexPath indexPathForRow:i inSection:indexPath.section]];
+            }
+            [self.tableView deleteRowsAtIndexPaths:deletedIndexPaths withRowAnimation:UITableViewRowAnimationBottom];
+        }
+
+        [self _updateVisibleSectionsAnimated:YES];
+    }
+
+    if (!dynamicSection.isExpandable) {
+        [self.tableView reloadSections:[NSIndexSet indexSetWithIndex:[self indexPathForProperty:relationshipDescription.name].section]
+                      withRowAnimation:UITableViewRowAnimationNone];
+    }
+}
+
 #pragma mark - Private category implementation ()
+
+- (NSString *)_detailedTextForRelationship:(NSString *)relationship
+{
+    NSRelationshipDescription *relationshipDescription = self.entityDescription.relationshipsByName[relationship];
+
+    if (relationshipDescription.isToMany) {
+        return [NSString stringWithFormat:NSLocalizedString(@"%d selected", @""), [[self.entity valueForKey:relationshipDescription.name] count]];
+    } else {
+        NSString *nameKeyPath = [self nameKeyPathForRelationship:relationshipDescription.name];
+
+        if (nameKeyPath) {
+            return [[self.entity valueForKey:relationshipDescription.name] valueForKey:nameKeyPath];
+        } else {
+            for (SLEntityViewControllerDynamicSection *section in self.sections) {
+                if ([section isKindOfClass:[SLEntityViewControllerDynamicSection class]] && [section.relationship isEqualToString:relationship]) {
+                    return section.formatBlock([self.entity valueForKey:relationship]);
+                    break;
+                }
+            }
+        }
+    }
+
+    return nil;
+}
 
 - (void)_removeCheckmarksInSection:(NSInteger)section
 {

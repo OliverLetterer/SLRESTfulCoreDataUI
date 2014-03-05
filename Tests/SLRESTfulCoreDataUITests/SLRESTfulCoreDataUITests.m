@@ -40,6 +40,8 @@ static SLEntity2 *createEntity2WithName(NSString *name)
 {
     [super setUp];
 
+    [[SLTestCoreDataStack sharedInstance] wipeDataStore];
+
     self.context = [SLTestCoreDataStack sharedInstance].mainThreadManagedObjectContext;
     self.entity = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass([SLEntity1 class])
                                                 inManagedObjectContext:self.context];
@@ -50,6 +52,8 @@ static SLEntity2 *createEntity2WithName(NSString *name)
                                             @"stringValue": @"String",
                                             @"dateValue": @"Date",
                                             @"dummyBool": @"dummy",
+                                            @"toOneRelation": @"toOneRelation",
+                                            @"toManyRelation": @"toManyRelation",
                                             };
 
     [UIApplication sharedApplication].delegate.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:self.viewController];
@@ -60,7 +64,6 @@ static SLEntity2 *createEntity2WithName(NSString *name)
     [super tearDown];
 
     [[UIApplication sharedApplication] sendAction:@selector(resignFirstResponder) to:nil from:nil forEvent:nil];
-    [[SLTestCoreDataStack sharedInstance] wipeDataStore];
 }
 
 - (void)testThatSLEntityViewControllerCanDisplayAStaticSection
@@ -315,6 +318,156 @@ static SLEntity2 *createEntity2WithName(NSString *name)
 
     expect(self.entity.stringValue).to.equal(values[1]);
     expect(self.entity.booleanValue).to.beTruthy();
+}
+
+- (void)testThatSLEntityViewControllerCanDisplayACollapsableDynamicSectionForToOneRelation
+{
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:NSStringFromClass([SLEntity2 class])];
+    fetchRequest.sortDescriptors = @[ [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES] ];
+
+    NSFetchedResultsController *controller = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
+                                                                                 managedObjectContext:self.context
+                                                                                   sectionNameKeyPath:nil cacheName:nil];
+
+    SLEntity2 *entity1 = createEntity2WithName(@"Name 1");
+    SLEntity2 *entity2 = createEntity2WithName(@"Name 2");
+    SLEntity2 *entity3 = createEntity2WithName(@"Name 3");
+
+    self.entity.toOneRelation = entity1;
+
+    SLEntityViewControllerSection *dynamicSection = [SLEntityViewControllerSection dynamicSectionWithRelationship:@"toOneRelation" fetchedResultsController:controller formatBlock:^NSString *(SLEntity2 *entity) {
+        return entity.name;
+    }];
+    dynamicSection.isExpandable = YES;
+
+    SLEntityViewControllerSection *staticSection = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"booleanValue" ]];
+    self.viewController.sections = @[ dynamicSection, staticSection ];
+
+    [self.viewController onlyShowAttribute:@"booleanValue" whenPredicateEvaluates:[NSPredicate predicateWithBlock:^BOOL(SLEntity1 *evaluatedObject, NSDictionary *bindings) {
+        return [evaluatedObject.toOneRelation.name isEqualToString:@"Name 1"];
+    }]];
+
+    [tester waitForViewWithAccessibilityLabel:@"toOneRelation"];
+    [tester waitForAbsenceOfViewWithAccessibilityLabel:entity2.name];
+
+    [tester tapViewWithAccessibilityLabel:@"toOneRelation"];
+    [tester waitForViewWithAccessibilityLabel:entity2.name];
+    [tester setOn:YES forSwitchWithAccessibilityLabel:@"BOOL"];
+    [tester tapViewWithAccessibilityLabel:entity3.name];
+
+    [tester waitForAbsenceOfViewWithAccessibilityLabel:entity2.name];
+
+    expect(self.entity.toOneRelation).to.equal(entity3);
+    expect(self.entity.booleanValue).to.beTruthy();
+}
+
+- (void)testThatSLEntityViewControllerCanDisplayACollapsableDynamicSectionForToManyRelation
+{
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:NSStringFromClass([SLEntity2 class])];
+    fetchRequest.sortDescriptors = @[ [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES] ];
+
+    NSFetchedResultsController *controller = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
+                                                                                 managedObjectContext:self.context
+                                                                                   sectionNameKeyPath:nil cacheName:nil];
+
+    SLEntity2 *entity1 = createEntity2WithName(@"Name 1");
+    SLEntity2 *entity2 = createEntity2WithName(@"Name 2");
+    SLEntity2 *entity3 = createEntity2WithName(@"Name 3");
+
+    SLEntityViewControllerSection *dynamicSection = [SLEntityViewControllerSection dynamicSectionWithRelationship:@"toManyRelation" fetchedResultsController:controller formatBlock:^NSString *(SLEntity2 *entity) {
+        return entity.name;
+    }];
+    dynamicSection.isExpandable = YES;
+
+    SLEntityViewControllerSection *staticSection = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"booleanValue" ]];
+    self.viewController.sections = @[ dynamicSection, staticSection ];
+
+    [self.viewController onlyShowAttribute:@"booleanValue" whenPredicateEvaluates:[NSPredicate predicateWithBlock:^BOOL(SLEntity1 *evaluatedObject, NSDictionary *bindings) {
+        return evaluatedObject.toManyRelation.count == 0;
+    }]];
+
+    [tester waitForViewWithAccessibilityLabel:@"toManyRelation"];
+    [tester waitForAbsenceOfViewWithAccessibilityLabel:entity2.name];
+
+    [tester tapViewWithAccessibilityLabel:@"toManyRelation"];
+    [tester waitForViewWithAccessibilityLabel:entity2.name];
+    [tester setOn:YES forSwitchWithAccessibilityLabel:@"BOOL"];
+
+    [tester tapViewWithAccessibilityLabel:entity1.name];
+    [tester tapViewWithAccessibilityLabel:entity2.name];
+    [tester tapViewWithAccessibilityLabel:entity3.name];
+    [tester tapViewWithAccessibilityLabel:@"toManyRelation"];
+
+    [tester waitForAbsenceOfViewWithAccessibilityLabel:entity2.name];
+
+    expect(self.entity.toManyRelation).to.haveCountOf(3);
+    expect(self.entity.toManyRelation).to.contain(entity1);
+    expect(self.entity.toManyRelation).to.contain(entity2);
+    expect(self.entity.toManyRelation).to.contain(entity3);
+
+    expect(self.entity.booleanValue).to.beTruthy();
+}
+
+- (void)testThatSLEntityViewControllerDoesntCrashWhenAddingEntitesWhileADynamicSectionIsExpanded
+{
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:NSStringFromClass([SLEntity2 class])];
+    fetchRequest.sortDescriptors = @[ [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES] ];
+
+    NSFetchedResultsController *controller = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
+                                                                                 managedObjectContext:self.context
+                                                                                   sectionNameKeyPath:nil cacheName:nil];
+
+    SLEntity2 *entity1 = createEntity2WithName(@"Name 1");
+
+    self.entity.toOneRelation = entity1;
+
+    SLEntityViewControllerSection *dynamicSection = [SLEntityViewControllerSection dynamicSectionWithRelationship:@"toOneRelation" fetchedResultsController:controller formatBlock:^NSString *(SLEntity2 *entity) {
+        return entity.name;
+    }];
+    dynamicSection.isExpandable = YES;
+
+    SLEntityViewControllerSection *staticSection = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"booleanValue" ]];
+    self.viewController.sections = @[ dynamicSection, staticSection ];
+
+    [self.viewController onlyShowAttribute:@"booleanValue" whenPredicateEvaluates:[NSPredicate predicateWithBlock:^BOOL(SLEntity1 *evaluatedObject, NSDictionary *bindings) {
+        return [evaluatedObject.toOneRelation.name isEqualToString:@"Name 1"];
+    }]];
+
+    [tester tapViewWithAccessibilityLabel:@"toOneRelation"];
+
+    createEntity2WithName(@"Name 2");
+    createEntity2WithName(@"Name 3");
+}
+
+- (void)testThatSLEntityViewControllerDoesntCrashWhenAddingEntitesWhileADynamicSectionIsCollapsed
+{
+    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:NSStringFromClass([SLEntity2 class])];
+    fetchRequest.sortDescriptors = @[ [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES] ];
+
+    NSFetchedResultsController *controller = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
+                                                                                 managedObjectContext:self.context
+                                                                                   sectionNameKeyPath:nil cacheName:nil];
+
+    SLEntity2 *entity1 = createEntity2WithName(@"Name 1");
+
+    self.entity.toOneRelation = entity1;
+
+    SLEntityViewControllerSection *dynamicSection = [SLEntityViewControllerSection dynamicSectionWithRelationship:@"toOneRelation" fetchedResultsController:controller formatBlock:^NSString *(SLEntity2 *entity) {
+        return entity.name;
+    }];
+    dynamicSection.isExpandable = YES;
+
+    SLEntityViewControllerSection *staticSection = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"booleanValue" ]];
+    self.viewController.sections = @[ dynamicSection, staticSection ];
+
+    [self.viewController onlyShowAttribute:@"booleanValue" whenPredicateEvaluates:[NSPredicate predicateWithBlock:^BOOL(SLEntity1 *evaluatedObject, NSDictionary *bindings) {
+        return [evaluatedObject.toOneRelation.name isEqualToString:@"Name 1"];
+    }]];
+
+    [tester waitForViewWithAccessibilityLabel:@"toOneRelation"];
+
+    createEntity2WithName(@"Name 2");
+    createEntity2WithName(@"Name 3");
 }
 
 @end

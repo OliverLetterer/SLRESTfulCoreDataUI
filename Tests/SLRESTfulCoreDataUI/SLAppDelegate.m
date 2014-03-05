@@ -8,6 +8,7 @@
 
 #import "SLAppDelegate.h"
 #import "SLEntity1.h"
+#import "SLEntity2.h"
 #import "SLTestCoreDataStack.h"
 
 #import <SLEntityViewController.h>
@@ -16,38 +17,55 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    [[SLTestCoreDataStack sharedInstance] wipeDataStore];
+    
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.backgroundColor = [UIColor whiteColor];
 
-    NSManagedObjectContext *context = [SLTestCoreDataStack sharedInstance].mainThreadManagedObjectContext;
-    SLEntity1 *entity = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass([SLEntity1 class])
-                                                      inManagedObjectContext:context];
+//    NSManagedObjectContext *context = [SLTestCoreDataStack sharedInstance].mainThreadManagedObjectContext;
+//    SLEntity1 *entity = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass([SLEntity1 class])
+//                                                      inManagedObjectContext:context];
+//
+//    SLEntityViewController *viewController = [[SLEntityViewController alloc] initWithEntity:entity editingType:SLEntityViewControllerEditingTypeCreate];
+//    viewController.propertyMapping = @{
+//                                       @"booleanValue": @"BOOL",
+//                                       @"stringValue": @"String",
+//                                       @"dateValue": @"Date",
+//                                       @"dummyBool": @"dummy",
+//                                       @"toOneRelation": @"toOneRelation"
+//                                       };
+//
+//
+//
+//    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:NSStringFromClass([SLEntity2 class])];
+//    fetchRequest.sortDescriptors = @[ [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES] ];
+//
+//    NSFetchedResultsController *controller = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
+//                                                                                 managedObjectContext:context
+//                                                                                   sectionNameKeyPath:nil cacheName:nil];
+//
+//    SLEntity2 *entity1 = createEntity2WithName(@"Name 1");
+//    SLEntity2 *entity2 = createEntity2WithName(@"Name 2");
+//    SLEntity2 *entity3 = createEntity2WithName(@"Name 3");
+//
+//    entity.toOneRelation = entity1;
+//
+//    SLEntityViewControllerSection *dynamicSection = [SLEntityViewControllerSection dynamicSectionWithRelationship:@"toOneRelation" fetchedResultsController:controller formatBlock:^NSString *(SLEntity2 *entity) {
+//        return entity.name;
+//    }];
+//    dynamicSection.isExpandable = YES;
+//
+//    SLEntityViewControllerSection *staticSection = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"booleanValue" ]];
+//    viewController.sections = @[ dynamicSection, staticSection ];
+//
+//    [viewController onlyShowAttribute:@"booleanValue" whenPredicateEvaluates:[NSPredicate predicateWithBlock:^BOOL(SLEntity1 *evaluatedObject, NSDictionary *bindings) {
+//        return [evaluatedObject.toOneRelation.name isEqualToString:@"Name 1"];
+//    }]];
+//
+//    self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:viewController];
 
-    SLEntityViewController *viewController = [[SLEntityViewController alloc] initWithEntity:entity editingType:SLEntityViewControllerEditingTypeCreate];
-    viewController.propertyMapping = @{
-                                       @"booleanValue": @"BOOL",
-                                       @"stringValue": @"String",
-                                       @"dateValue": @"Date",
-                                       @"dummyBool": @"dummy",
-                                       };
-
-    NSArray *values = @[ @"value 0", @"value 1", @"value 2", @"value 3" ];
-    NSArray *options = @[ @"Option 0", @"Option 1", @"Option 2", @"Option 3" ];
-
-    entity.stringValue = values.firstObject;
-
-    SLEntityViewControllerSection *enumSection = [SLEntityViewControllerSection staticSectionWithEnumValue:values humanReadableOptions:options forAttribute:@"stringValue"];
-    enumSection.isExpandable = YES;
-
-    SLEntityViewControllerSection *staticSection = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"booleanValue" ]];
-    viewController.sections = @[ enumSection, staticSection ];
-
-    [viewController onlyShowAttribute:@"booleanValue" whenPredicateEvaluates:[NSPredicate predicateWithBlock:^BOOL(SLEntity1 *evaluatedObject, NSDictionary *bindings) {
-        return [evaluatedObject.stringValue isEqualToString:values.firstObject];
-    }]];
-
-    self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:viewController];
-
+    UIViewController *dummyViewController = [[UIViewController alloc] init];
+    self.window.rootViewController = dummyViewController;
     [self.window makeKeyAndVisible];
     return YES;
 }
