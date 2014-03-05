@@ -58,7 +58,7 @@ typedef NS_ENUM(NSUInteger, SLEntityViewControllerEditingType) {
 /**
  @abstract  <#abstract comment#>
  */
-@interface SLEntityViewController : UITableViewController <UIViewControllerRestoration, UIDataSourceModelAssociation, UITextFieldDelegate>
+@interface SLEntityViewController : UITableViewController <UITextFieldDelegate>
 
 @property (nonatomic, readonly) SLEntityViewControllerEditingType editingType;
 
