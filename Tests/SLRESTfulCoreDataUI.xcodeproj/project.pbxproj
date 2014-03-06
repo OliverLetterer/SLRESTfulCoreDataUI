@@ -53,6 +53,9 @@
 		A711F0CF18C082D0005A4100 /* SLAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SLAppDelegate.m; sourceTree = "<group>"; };
 		A711F0D118C082D0005A4100 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		A711F0D818C082D0005A4100 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		A721B66618C86EE100E22CAA /* Rakefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = Rakefile; path = ../Rakefile; sourceTree = "<group>"; };
+		A721B66818C86EEC00E22CAA /* CHANGELOG.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = CHANGELOG.md; path = ../CHANGELOG.md; sourceTree = "<group>"; };
+		A721B66A18C86EF200E22CAA /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		A7A3BC2B18C0884B00B18031 /* SLRESTfulCoreDataUITests.octest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SLRESTfulCoreDataUITests.octest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A7A3BC2C18C0884B00B18031 /* SenTestingKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SenTestingKit.framework; path = Library/Frameworks/SenTestingKit.framework; sourceTree = DEVELOPER_DIR; };
 		A7A3BC3218C0884B00B18031 /* SLRESTfulCoreDataUITests-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "SLRESTfulCoreDataUITests-Info.plist"; sourceTree = "<group>"; };
@@ -104,6 +107,9 @@
 				A711F0BD18C082D0005A4100 /* Products */,
 				095E1277CF4E4DDA86976384 /* Pods.xcconfig */,
 				0558793D98094AE3A9EF658F /* Pods-SLRESTfulCoreDataUITests.xcconfig */,
+				A721B66618C86EE100E22CAA /* Rakefile */,
+				A721B66818C86EEC00E22CAA /* CHANGELOG.md */,
+				A721B66A18C86EF200E22CAA /* README.md */,
 			);
 			sourceTree = "<group>";
 		};

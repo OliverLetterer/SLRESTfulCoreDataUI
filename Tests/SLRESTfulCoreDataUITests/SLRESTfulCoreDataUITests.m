@@ -11,6 +11,34 @@
 #import "SLEntity2.h"
 #import "SLTestCoreDataStack.h"
 
+@interface DummySection : NSObject <UITableViewDataSource, UITableViewDelegate>
+
+@end
+
+@implementation DummySection
+
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+    return 2;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSString *cellIdentifier = @"SLEntitySwitchCell";
+    SLEntitySwitchCell *cell = [tableView dequeueReusableCellWithIdentifier:cellIdentifier];
+
+    if (!cell) {
+        cell = [[SLEntitySwitchCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellIdentifier];
+    }
+
+    cell.textLabel.text = @"Blubb";
+    cell.switchControl.accessibilityLabel = cell.textLabel.text;
+
+    return cell;
+}
+
+@end
+
 static SLEntity2 *createEntity2WithName(NSString *name)
 {
     SLEntity2 *entity = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass([SLEntity2 class])
@@ -26,6 +54,8 @@ static SLEntity2 *createEntity2WithName(NSString *name)
 }
 
 @interface SLRESTfulCoreDataUITests : SenTestCase
+
+@property (nonatomic, strong) DummySection *dummy;
 
 @property (nonatomic, strong) SLEntityViewController *viewController;
 @property (nonatomic, strong) SLEntity1 *entity;
@@ -63,6 +93,7 @@ static SLEntity2 *createEntity2WithName(NSString *name)
 {
     [super tearDown];
 
+    self.dummy = nil;
     [[UIApplication sharedApplication] sendAction:@selector(resignFirstResponder) to:nil from:nil forEvent:nil];
 }
 
@@ -468,6 +499,19 @@ static SLEntity2 *createEntity2WithName(NSString *name)
 
     createEntity2WithName(@"Name 2");
     createEntity2WithName(@"Name 3");
+}
+
+- (void)testThatSLEntityViewControllerCanDisplayDataSourceBackedSections
+{
+    _dummy = [[DummySection alloc] init];
+    _dummy = [[DummySection alloc] init];
+    SLEntityViewControllerSection *dynamicSection = [SLEntityViewControllerSection sectionWithDataSource:_dummy delegate:_dummy];
+
+    SLEntityViewControllerSection *staticSection = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"booleanValue" ]];
+    self.viewController.sections = @[ dynamicSection, staticSection ];
+
+    [tester waitForViewWithAccessibilityLabel:@"Blubb"];
+    [tester setOn:YES forSwitchWithAccessibilityLabel:@"Blubb"];
 }
 
 @end

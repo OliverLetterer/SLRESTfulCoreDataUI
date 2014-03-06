@@ -12,6 +12,7 @@
 #import "SLTestCoreDataStack.h"
 
 #import <SLEntityViewController.h>
+#import <SLEntitySwitchCell.h>
 
 @implementation SLAppDelegate
 
@@ -36,31 +37,6 @@
 //                                       };
 //
 //
-//
-//    NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:NSStringFromClass([SLEntity2 class])];
-//    fetchRequest.sortDescriptors = @[ [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES] ];
-//
-//    NSFetchedResultsController *controller = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
-//                                                                                 managedObjectContext:context
-//                                                                                   sectionNameKeyPath:nil cacheName:nil];
-//
-//    SLEntity2 *entity1 = createEntity2WithName(@"Name 1");
-//    SLEntity2 *entity2 = createEntity2WithName(@"Name 2");
-//    SLEntity2 *entity3 = createEntity2WithName(@"Name 3");
-//
-//    entity.toOneRelation = entity1;
-//
-//    SLEntityViewControllerSection *dynamicSection = [SLEntityViewControllerSection dynamicSectionWithRelationship:@"toOneRelation" fetchedResultsController:controller formatBlock:^NSString *(SLEntity2 *entity) {
-//        return entity.name;
-//    }];
-//    dynamicSection.isExpandable = YES;
-//
-//    SLEntityViewControllerSection *staticSection = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"booleanValue" ]];
-//    viewController.sections = @[ dynamicSection, staticSection ];
-//
-//    [viewController onlyShowAttribute:@"booleanValue" whenPredicateEvaluates:[NSPredicate predicateWithBlock:^BOOL(SLEntity1 *evaluatedObject, NSDictionary *bindings) {
-//        return [evaluatedObject.toOneRelation.name isEqualToString:@"Name 1"];
-//    }]];
 //
 //    self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:viewController];
 

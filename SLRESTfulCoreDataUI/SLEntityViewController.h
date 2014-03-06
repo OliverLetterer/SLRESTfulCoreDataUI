@@ -51,6 +51,8 @@ typedef NS_ENUM(NSUInteger, SLEntityViewControllerEditingType) {
                       fetchedResultsController:(NSFetchedResultsController *)fetchedResultsController
                                    formatBlock:(NSString *(^)(id entity))formatBlock;
 
++ (instancetype)sectionWithDataSource:(id<UITableViewDataSource>)dataSource delegate:(id<UITableViewDelegate>)delegate;
+
 @end
 
 

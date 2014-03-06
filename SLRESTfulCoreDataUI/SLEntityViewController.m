@@ -68,6 +68,11 @@ static NSString *capitalizedString(NSString *string)
 @property (nonatomic, copy) NSString *(^formatBlock)(id entity);
 @end
 
+@interface SLEntityViewControllerDelegatedSection : SLEntityViewControllerSection
+@property (nonatomic, weak) id<UITableViewDataSource> dataSource;
+@property (nonatomic, weak) id<UITableViewDelegate> delegate;
+@end
+
 
 
 char *const SLEntityViewControllerAttributeDescriptionKey;
@@ -154,6 +159,14 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
     return section;
 }
 
++ (instancetype)sectionWithDataSource:(id<UITableViewDataSource>)dataSource delegate:(id<UITableViewDelegate>)delegate;
+{
+    SLEntityViewControllerDelegatedSection *section = [[SLEntityViewControllerDelegatedSection alloc] init];
+    section.dataSource = dataSource;
+    section.delegate = delegate;
+    return section;
+}
+
 @end
 
 
@@ -227,6 +240,23 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         }
     }
 
+    return YES;
+}
+
+@end
+
+@implementation SLEntityViewControllerDelegatedSection
+
+- (instancetype)copyWithZone:(NSZone *)zone
+{
+    SLEntityViewControllerDelegatedSection *section = [super copyWithZone:zone];
+    section.delegate = self.delegate;
+    section.dataSource = self.dataSource;
+    return section;
+}
+
+- (BOOL)isVisibleInEntityViewController:(SLEntityViewController *)viewController
+{
     return YES;
 }
 
@@ -540,6 +570,11 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         }
 
         return staticSection.values.count;
+    } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerDelegatedSection class]]) {
+        SLEntityViewControllerDelegatedSection *section = sectionInfo;
+        id<UITableViewDataSource> dataSource = section.dataSource;
+
+        return [dataSource tableView:tableView numberOfRowsInSection:section];
     }
 
     NSParameterAssert(NO);
@@ -565,6 +600,11 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         return [self _tableView:tableView cellForStaticEnumSection:sectionInfo atIndexPath:indexPath];
     } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerDynamicSection class]]) {
         return [self _tableView:tableView cellForDynamicSection:sectionInfo atIndexPath:indexPath];
+    } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerDelegatedSection class]]) {
+        SLEntityViewControllerDelegatedSection *section = sectionInfo;
+        id<UITableViewDataSource> dataSource = section.dataSource;
+
+        return [dataSource tableView:tableView cellForRowAtIndexPath:indexPath];
     }
 
     NSAssert(NO, @"no cell for %@", indexPath);
@@ -707,6 +747,13 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         [self _tableView:tableView didSelectRowInDynamicSection:sectionInfo atIndexPath:indexPath];
     } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerStaticEnumSection class]]) {
         [self _tableView:tableView didSelectRowInEnumSection:sectionInfo atIndexPath:indexPath];
+    } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerDelegatedSection class]]) {
+        SLEntityViewControllerDelegatedSection *section = sectionInfo;
+        id<UITableViewDelegate> deletage = section.delegate;
+
+        if ([deletage respondsToSelector:@selector(tableView:didSelectRowAtIndexPath:)]) {
+            [deletage tableView:tableView didSelectRowAtIndexPath:indexPath];
+        }
     }
 
     [tableView deselectRowAtIndexPath:indexPath animated:NO];
@@ -1575,9 +1622,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
             visibleSectionInfo.footerText = staticSection.footerText;
 
             [visibleSections addObject:visibleSectionInfo];
-        } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerDynamicSection class]]) {
-            [visibleSections addObject:[sectionInfo copy]];
-        } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerStaticEnumSection class]]) {
+        } else {
             [visibleSections addObject:[sectionInfo copy]];
         }
     }
