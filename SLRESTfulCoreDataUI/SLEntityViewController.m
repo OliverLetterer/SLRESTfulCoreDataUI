@@ -571,8 +571,8 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
         return staticSection.values.count;
     } else if ([sectionInfo isKindOfClass:[SLEntityViewControllerDelegatedSection class]]) {
-        SLEntityViewControllerDelegatedSection *section = sectionInfo;
-        id<UITableViewDataSource> dataSource = section.dataSource;
+        SLEntityViewControllerDelegatedSection *delegatedSection = sectionInfo;
+        id<UITableViewDataSource> dataSource = delegatedSection.dataSource;
 
         return [dataSource tableView:tableView numberOfRowsInSection:section];
     }
