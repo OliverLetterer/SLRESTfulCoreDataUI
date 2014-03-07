@@ -1613,7 +1613,7 @@ static void * SLEntityViewControllerAttributeDescriptionKey = &SLEntityViewContr
     NSParameterAssert(attributeDescription);
 
     [self.entity setValue:sender.date forKey:attributeDescription.name];
-    SLEntityTextFieldCell *cell = [self.tableView cellForRowAtIndexPath:[self indexPathForProperty:attributeDescription.name]];
+    SLEntityTextFieldCell *cell = (SLEntityTextFieldCell *)[self.tableView cellForRowAtIndexPath:[self indexPathForProperty:attributeDescription.name]];
     cell.textField.text = [self stringValueForAttribute:attributeDescription.name];
 
     [self _updateVisibleSectionsAnimated:YES];
