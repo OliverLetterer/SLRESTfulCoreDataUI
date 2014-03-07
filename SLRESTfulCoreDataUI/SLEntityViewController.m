@@ -75,7 +75,7 @@ static NSString *capitalizedString(NSString *string)
 
 
 
-char *const SLEntityViewControllerAttributeDescriptionKey;
+static void * SLEntityViewControllerAttributeDescriptionKey = &SLEntityViewControllerAttributeDescriptionKey;
 
 @interface SLEntityViewController () <SLSelectEnumAttributeViewControllerDelegate, NSFetchedResultsControllerDelegate> {
     NSManagedObject *_entity;
@@ -684,7 +684,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
                         viewController.tableView.backgroundView = [[UIImageView alloc] initWithImage:imageView.image];
                     }
 
-                    objc_setAssociatedObject(viewController, &SLEntityViewControllerAttributeDescriptionKey,
+                    objc_setAssociatedObject(viewController, SLEntityViewControllerAttributeDescriptionKey,
                                              attributeDescription, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 
                     [self.navigationController pushViewController:viewController animated:YES];
@@ -763,7 +763,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (NSString *)propertyNameForTextField:(UITextField *)textField
 {
-    NSAttributeDescription *attribute = objc_getAssociatedObject(textField, &SLEntityViewControllerAttributeDescriptionKey);
+    NSAttributeDescription *attribute = objc_getAssociatedObject(textField, SLEntityViewControllerAttributeDescriptionKey);
     NSParameterAssert(attribute);
 
     return attribute.name;
@@ -849,7 +849,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
         cell.textLabel.text = self.propertyMapping[attributeDescription.name];
 
-        objc_setAssociatedObject(cell.textField, &SLEntityViewControllerAttributeDescriptionKey,
+        objc_setAssociatedObject(cell.textField, SLEntityViewControllerAttributeDescriptionKey,
                                  attributeDescription, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 
         cell.textField.text = [self stringValueForAttribute:attributeDescription.name];
@@ -862,6 +862,10 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         if (attributeDescription.attributeType == NSDateAttributeType) {
             UIDatePicker *datePicker = [[UIDatePicker alloc] init];
             datePicker.datePickerMode = UIDatePickerModeDateAndTime;
+            [datePicker addTarget:self action:@selector(_datePickerValueChanged:) forControlEvents:UIControlEventValueChanged];
+
+            objc_setAssociatedObject(datePicker, SLEntityViewControllerAttributeDescriptionKey,
+                                     attributeDescription, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 
             cell.textField.inputView = datePicker;
         } else {
@@ -907,7 +911,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
         cell.textLabel.text = self.propertyMapping[attributeDescription.name];
         cell.switchControl.on = [[self.entity valueForKey:attributeDescription.name] boolValue];
         cell.switchControl.accessibilityLabel = cell.textLabel.text;
-        objc_setAssociatedObject(cell.switchControl, &SLEntityViewControllerAttributeDescriptionKey,
+        objc_setAssociatedObject(cell.switchControl, SLEntityViewControllerAttributeDescriptionKey,
                                  attributeDescription, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 
         return cell;
@@ -1236,7 +1240,7 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (void)selectEnumAttributeViewController:(SLSelectEnumAttributeViewController *)viewController didSelectEnumValue:(id)enumValue
 {
-    NSAttributeDescription *attributeDescription = objc_getAssociatedObject(viewController, &SLEntityViewControllerAttributeDescriptionKey);
+    NSAttributeDescription *attributeDescription = objc_getAssociatedObject(viewController, SLEntityViewControllerAttributeDescriptionKey);
 
     [self.entity setValue:enumValue forKey:attributeDescription.name];
     [self _updateVisibleSectionsAnimated:NO];
@@ -1588,16 +1592,30 @@ char *const SLEntityViewControllerAttributeDescriptionKey;
 
 - (void)_textFieldEditingChanged:(UITextField *)sender
 {
-    NSAttributeDescription *attributeDescription = objc_getAssociatedObject(sender, &SLEntityViewControllerAttributeDescriptionKey);
+    NSAttributeDescription *attributeDescription = objc_getAssociatedObject(sender, SLEntityViewControllerAttributeDescriptionKey);
+    NSParameterAssert(attributeDescription);
 
     [self applyStringValue:sender.text forAttribute:attributeDescription.name];
 }
 
 - (void)_switchValueChanged:(UISwitch *)sender
 {
-    NSAttributeDescription *attributeDescription = objc_getAssociatedObject(sender, &SLEntityViewControllerAttributeDescriptionKey);
+    NSAttributeDescription *attributeDescription = objc_getAssociatedObject(sender, SLEntityViewControllerAttributeDescriptionKey);
+    NSParameterAssert(attributeDescription);
 
     [self.entity setValue:@(sender.isOn) forKey:attributeDescription.name];
+    [self _updateVisibleSectionsAnimated:YES];
+}
+
+- (void)_datePickerValueChanged:(UIDatePicker *)sender
+{
+    NSAttributeDescription *attributeDescription = objc_getAssociatedObject(sender, SLEntityViewControllerAttributeDescriptionKey);
+    NSParameterAssert(attributeDescription);
+
+    [self.entity setValue:sender.date forKey:attributeDescription.name];
+    SLEntityTextFieldCell *cell = [self.tableView cellForRowAtIndexPath:[self indexPathForProperty:attributeDescription.name]];
+    cell.textField.text = [self stringValueForAttribute:attributeDescription.name];
+
     [self _updateVisibleSectionsAnimated:YES];
 }
 

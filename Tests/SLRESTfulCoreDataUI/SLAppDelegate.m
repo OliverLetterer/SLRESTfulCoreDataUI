@@ -23,25 +23,26 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.backgroundColor = [UIColor whiteColor];
 
-//    NSManagedObjectContext *context = [SLTestCoreDataStack sharedInstance].mainThreadManagedObjectContext;
-//    SLEntity1 *entity = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass([SLEntity1 class])
-//                                                      inManagedObjectContext:context];
-//
-//    SLEntityViewController *viewController = [[SLEntityViewController alloc] initWithEntity:entity editingType:SLEntityViewControllerEditingTypeCreate];
-//    viewController.propertyMapping = @{
-//                                       @"booleanValue": @"BOOL",
-//                                       @"stringValue": @"String",
-//                                       @"dateValue": @"Date",
-//                                       @"dummyBool": @"dummy",
-//                                       @"toOneRelation": @"toOneRelation"
-//                                       };
-//
-//
-//
-//    self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:viewController];
+    NSManagedObjectContext *context = [SLTestCoreDataStack sharedInstance].mainThreadManagedObjectContext;
+    SLEntity1 *entity = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass([SLEntity1 class])
+                                                      inManagedObjectContext:context];
 
-    UIViewController *dummyViewController = [[UIViewController alloc] init];
-    self.window.rootViewController = dummyViewController;
+    SLEntityViewController *viewController = [[SLEntityViewController alloc] initWithEntity:entity editingType:SLEntityViewControllerEditingTypeCreate];
+    viewController.propertyMapping = @{
+                                       @"booleanValue": @"BOOL",
+                                       @"stringValue": @"String",
+                                       @"dateValue": @"Date",
+                                       @"dummyBool": @"dummy",
+                                       @"toOneRelation": @"toOneRelation"
+                                       };
+
+    SLEntityViewControllerSection *section = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"dateValue" ]];
+    viewController.sections = @[ section ];
+    
+    self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:viewController];
+
+//    UIViewController *dummyViewController = [[UIViewController alloc] init];
+//    self.window.rootViewController = dummyViewController;
     [self.window makeKeyAndVisible];
     return YES;
 }

@@ -1,3 +1,7 @@
+# Version 1.10.1
+
+* Bug fixes regarding date attributes.
+
 # Version 1.10.0
 
 * New `[SLEntityViewControllerSection sectionWithDataSource:delegate:]` allows custom UITableViewDataSources and UITableViewDelegates.
