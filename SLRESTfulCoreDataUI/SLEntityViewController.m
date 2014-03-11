@@ -1481,7 +1481,13 @@ static void * SLEntityViewControllerAttributeDescriptionKey = &SLEntityViewContr
         [self _removeCheckmarksInSection:indexPath.section];
 
         [tableView cellForRowAtIndexPath:indexPath].accessoryType = UITableViewCellAccessoryCheckmark;
-        [tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:indexPath.section]].detailTextLabel.text = staticSection.humanReadableOptions[modelIndex];
+        UITableViewCell *cell = [tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:indexPath.section]];
+
+        [UIView animateWithDuration:0.25 animations:^{
+            cell.detailTextLabel.text = staticSection.humanReadableOptions[modelIndex];
+            cell.detailTextLabel.textColor = [UIColor darkGrayColor];
+            cell.backgroundView.backgroundColor = [UIColor whiteColor];
+        }];
 
         staticSection.isExpanded = NO;
         originalSection.isExpanded = NO;
@@ -1558,6 +1564,8 @@ static void * SLEntityViewControllerAttributeDescriptionKey = &SLEntityViewContr
             [tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:indexPath.section]].detailTextLabel.text = [self _detailedTextForRelationship:relationshipDescription.name];
         }
 
+        [tableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationNone];
+
         [self _updateVisibleSectionsAnimated:YES];
     } else {
         [self.entity setValue:thisEntity forKey:relationshipDescription.name];
@@ -1570,7 +1578,14 @@ static void * SLEntityViewControllerAttributeDescriptionKey = &SLEntityViewContr
             [self _removeCheckmarksInSection:indexPath.section];
 
             [tableView cellForRowAtIndexPath:indexPath].accessoryType = UITableViewCellAccessoryCheckmark;
-            [tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:indexPath.section]].detailTextLabel.text = [self _detailedTextForRelationship:relationshipDescription.name];
+
+            UITableViewCell *cell = [tableView cellForRowAtIndexPath:[NSIndexPath indexPathForRow:0 inSection:indexPath.section]];
+
+            [UIView animateWithDuration:0.25 animations:^{
+                cell.detailTextLabel.text = [self _detailedTextForRelationship:relationshipDescription.name];
+                cell.detailTextLabel.textColor = [UIColor darkGrayColor];
+                cell.backgroundView.backgroundColor = [UIColor whiteColor];
+            }];
 
             NSMutableArray *deletedIndexPaths = [NSMutableArray array];
             for (int i = 1; i <= dynamicSection.fetchedResultsController.fetchedObjects.count; i++) {

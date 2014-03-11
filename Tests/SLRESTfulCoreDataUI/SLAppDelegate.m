@@ -66,13 +66,24 @@ static SLEntity2 *createEntity2WithName(NSString *name)
         SLEntity2 *entity2 = createEntity2WithName(@"Name 2");
         SLEntity2 *entity3 = createEntity2WithName(@"Name 3");
 
-        SLEntityViewControllerSection *dynamicSection = [SLEntityViewControllerSection dynamicSectionWithRelationship:@"toManyRelation" fetchedResultsController:controller formatBlock:^NSString *(SLEntity2 *entity) {
+        NSArray *values = @[ @"value 0", @"value 1", @"value 2", @"value 3" ];
+        NSArray *options = @[ @"Option 0", @"Option 1", @"Option 2", @"Option 3" ];
+
+        SLEntityViewControllerSection *enumSection = [SLEntityViewControllerSection staticSectionWithEnumValue:values humanReadableOptions:options forAttribute:@"stringValue"];
+        enumSection.isExpandable = YES;
+        
+        SLEntityViewControllerSection *dynamicSection = [SLEntityViewControllerSection dynamicSectionWithRelationship:@"toOneRelation" fetchedResultsController:controller formatBlock:^NSString *(SLEntity2 *entity) {
             return entity.name;
         }];
         dynamicSection.isExpandable = YES;
 
+        SLEntityViewControllerSection *dynamicSection2 = [SLEntityViewControllerSection dynamicSectionWithRelationship:@"toManyRelation" fetchedResultsController:controller formatBlock:^NSString *(SLEntity2 *entity) {
+            return entity.name;
+        }];
+        dynamicSection2.isExpandable = YES;
+
         SLEntityViewControllerSection *staticSection = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"booleanValue" ]];
-        viewController.sections = @[ dynamicSection, staticSection ];
+        viewController.sections = @[ dynamicSection, dynamicSection2, enumSection, staticSection ];
     }
     
     self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:viewController];
