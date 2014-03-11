@@ -42,7 +42,8 @@
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier 
 {
     if (self = [super initWithStyle:style reuseIdentifier:reuseIdentifier]) {
-        // Initialization code
+        self.backgroundView = [[UIView alloc] initWithFrame:CGRectZero];
+        self.selectedBackgroundView = [[UIView alloc] initWithFrame:CGRectZero];
     }
     return self;
 }

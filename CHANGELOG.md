@@ -1,3 +1,7 @@
+# Version 1.11.0
+
+* SLEntityViewController.hightlightedSectionColor and SLEntityViewController.expandedSectionBackgroundColor
+
 # Version 1.10.1
 
 * Bug fixes regarding date attributes.

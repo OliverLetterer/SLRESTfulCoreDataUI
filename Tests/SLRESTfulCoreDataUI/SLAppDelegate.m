@@ -14,6 +14,20 @@
 #import <SLEntityViewController.h>
 #import <SLEntitySwitchCell.h>
 
+static SLEntity2 *createEntity2WithName(NSString *name)
+{
+    SLEntity2 *entity = [NSEntityDescription insertNewObjectForEntityForName:NSStringFromClass([SLEntity2 class])
+                                                      inManagedObjectContext:[SLTestCoreDataStack sharedInstance].mainThreadManagedObjectContext];
+
+    entity.name = name;
+
+    NSError *saveError = nil;
+    [[SLTestCoreDataStack sharedInstance].mainThreadManagedObjectContext save:&saveError];
+    NSCAssert(saveError == nil, @"error saving NSManagedObjectContext: %@", saveError);
+
+    return entity;
+}
+
 @implementation SLAppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
@@ -28,16 +42,38 @@
                                                       inManagedObjectContext:context];
 
     SLEntityViewController *viewController = [[SLEntityViewController alloc] initWithEntity:entity editingType:SLEntityViewControllerEditingTypeCreate];
+    viewController.hightlightedSectionColor = [UIColor redColor];
+    viewController.expandedSectionBackgroundColor = [UIColor colorWithWhite:0.9 alpha:1.0];
+
     viewController.propertyMapping = @{
                                        @"booleanValue": @"BOOL",
                                        @"stringValue": @"String",
                                        @"dateValue": @"Date",
                                        @"dummyBool": @"dummy",
-                                       @"toOneRelation": @"toOneRelation"
+                                       @"toOneRelation": @"toOneRelation",
+                                       @"toManyRelation": @"toManyRelation",
                                        };
 
-    SLEntityViewControllerSection *section = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"dateValue" ]];
-    viewController.sections = @[ section ];
+    {
+        NSFetchRequest *fetchRequest = [[NSFetchRequest alloc] initWithEntityName:NSStringFromClass([SLEntity2 class])];
+        fetchRequest.sortDescriptors = @[ [NSSortDescriptor sortDescriptorWithKey:@"name" ascending:YES] ];
+
+        NSFetchedResultsController *controller = [[NSFetchedResultsController alloc] initWithFetchRequest:fetchRequest
+                                                                                     managedObjectContext:entity.managedObjectContext
+                                                                                       sectionNameKeyPath:nil cacheName:nil];
+
+        SLEntity2 *entity1 = createEntity2WithName(@"Name 1");
+        SLEntity2 *entity2 = createEntity2WithName(@"Name 2");
+        SLEntity2 *entity3 = createEntity2WithName(@"Name 3");
+
+        SLEntityViewControllerSection *dynamicSection = [SLEntityViewControllerSection dynamicSectionWithRelationship:@"toManyRelation" fetchedResultsController:controller formatBlock:^NSString *(SLEntity2 *entity) {
+            return entity.name;
+        }];
+        dynamicSection.isExpandable = YES;
+
+        SLEntityViewControllerSection *staticSection = [SLEntityViewControllerSection staticSectionWithProperties:@[ @"booleanValue" ]];
+        viewController.sections = @[ dynamicSection, staticSection ];
+    }
     
     self.window.rootViewController = [[UINavigationController alloc] initWithRootViewController:viewController];
 

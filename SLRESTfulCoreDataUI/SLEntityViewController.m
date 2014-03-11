@@ -1330,6 +1330,18 @@ static void * SLEntityViewControllerAttributeDescriptionKey = &SLEntityViewContr
                 cell.detailTextLabel.text = nil;
             }
 
+            if ([tableView numberOfRowsInSection:indexPath.section] > 1 && self.hightlightedSectionColor) {
+                cell.detailTextLabel.textColor = self.hightlightedSectionColor;
+            } else {
+                cell.detailTextLabel.textColor = [UIColor darkGrayColor];
+            }
+
+            if ([tableView numberOfRowsInSection:indexPath.section] > 1 && self.expandedSectionBackgroundColor) {
+                cell.backgroundView.backgroundColor = self.expandedSectionBackgroundColor;
+            } else {
+                cell.backgroundView.backgroundColor = [UIColor whiteColor];
+            }
+
             cell.accessibilityLabel = cell.textLabel.text;
 
             return cell;
@@ -1354,6 +1366,12 @@ static void * SLEntityViewControllerAttributeDescriptionKey = &SLEntityViewContr
         cell.accessoryType = UITableViewCellAccessoryNone;
     }
 
+    if (self.expandedSectionBackgroundColor) {
+        cell.backgroundView.backgroundColor = self.expandedSectionBackgroundColor;
+    } else {
+        cell.backgroundView.backgroundColor = [UIColor whiteColor];
+    }
+
     cell.accessibilityLabel = cell.textLabel.text;
 
     return cell;
@@ -1375,6 +1393,18 @@ static void * SLEntityViewControllerAttributeDescriptionKey = &SLEntityViewContr
             cell.textLabel.text = self.propertyMapping[dynamicSection.relationship];
             cell.detailTextLabel.text = [self _detailedTextForRelationship:dynamicSection.relationship];
             cell.accessibilityLabel = cell.textLabel.text;
+
+            if ([tableView numberOfRowsInSection:indexPath.section] > 1 && self.hightlightedSectionColor) {
+                cell.detailTextLabel.textColor = self.hightlightedSectionColor;
+            } else {
+                cell.detailTextLabel.textColor = [UIColor darkGrayColor];
+            }
+
+            if ([tableView numberOfRowsInSection:indexPath.section] > 1 && self.expandedSectionBackgroundColor) {
+                cell.backgroundView.backgroundColor = self.expandedSectionBackgroundColor;
+            } else {
+                cell.backgroundView.backgroundColor = [UIColor whiteColor];
+            }
             
             return cell;
         }
@@ -1399,6 +1429,12 @@ static void * SLEntityViewControllerAttributeDescriptionKey = &SLEntityViewContr
         cell.accessoryType = [set containsObject:thisEntity] ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
     } else {
         cell.accessoryType = thisEntity == [self.entity valueForKey:relationshipDescription.name] ? UITableViewCellAccessoryCheckmark : UITableViewCellAccessoryNone;
+    }
+
+    if (self.expandedSectionBackgroundColor) {
+        cell.backgroundView.backgroundColor = self.expandedSectionBackgroundColor;
+    } else {
+        cell.backgroundView.backgroundColor = [UIColor whiteColor];
     }
 
     return cell;
@@ -1433,6 +1469,7 @@ static void * SLEntityViewControllerAttributeDescriptionKey = &SLEntityViewContr
                 [self.tableView insertRowsAtIndexPaths:insertedIndexPaths withRowAnimation:UITableViewRowAnimationBottom];
             }
 
+            [self.tableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationFade];
             return;
         } else {
             modelIndex = modelIndex - 1;
@@ -1495,6 +1532,7 @@ static void * SLEntityViewControllerAttributeDescriptionKey = &SLEntityViewContr
                 [self.tableView insertRowsAtIndexPaths:insertedIndexPaths withRowAnimation:UITableViewRowAnimationBottom];
             }
 
+            [self.tableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationFade];
             return;
         } else {
             modelIndex = modelIndex - 1;

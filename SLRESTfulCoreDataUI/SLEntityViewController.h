@@ -133,4 +133,10 @@ typedef NS_ENUM(NSUInteger, SLEntityViewControllerEditingType) {
 - (void)cancelButtonClicked:(UIBarButtonItem *)sender;
 - (void)saveButtonClicked:(UIBarButtonItem *)sender;
 
+/**
+ Color used for detailTextLabel in expanded sections
+ */
+@property (nonatomic, strong) UIColor *hightlightedSectionColor;
+@property (nonatomic, strong) UIColor *expandedSectionBackgroundColor;
+
 @end
