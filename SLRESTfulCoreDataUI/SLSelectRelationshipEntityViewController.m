@@ -246,7 +246,7 @@ static NSString *capitalizedString(NSString *string)
             addOrDeleteSelector = NSSelectorFromString([NSString stringWithFormat:@"add%@Object:", capitalizedString(self.relationshipDescription.name)]);
         }
         
-        ((void(*)(id, SEL, ...))objc_msgSend)(self.entity, addOrDeleteSelector, thisEntity);
+        ((void(*)(id, SEL, id))objc_msgSend)(self.entity, addOrDeleteSelector, thisEntity);
         
         [self.tableView deselectRowAtIndexPath:indexPath animated:NO];
         [self.tableView reloadRowsAtIndexPaths:@[ indexPath ] withRowAnimation:UITableViewRowAnimationNone];
