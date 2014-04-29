@@ -2,7 +2,7 @@
 //  SLEntitySwitchCell.m
 //
 //  The MIT License (MIT)
-//  Copyright (c) 2013 Oliver Letterer, Sparrow-Labs
+//  Copyright (c) 2013-2014 Oliver Letterer, Sparrow-Labs
 //
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -25,71 +25,40 @@
 
 #import "SLEntitySwitchCell.h"
 
-
-
-@interface SLEntitySwitchCell () {
-    
-}
-
-@end
-
-
-
 @implementation SLEntitySwitchCell
-
-#pragma mark - Initialization
 
 - (id)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(NSString *)reuseIdentifier
 {
     if (self = [super initWithStyle:style reuseIdentifier:reuseIdentifier]) {
         _switchControl = [[UISwitch alloc] initWithFrame:CGRectZero];
         [self.contentView addSubview:_switchControl];
-        
+
         self.selectionStyle = UITableViewCellSelectionStyleNone;
     }
     return self;
 }
 
-#pragma mark - UITableViewCell
-
-//- (void)setSelected:(BOOL)selected animated:(BOOL)animated
-//{
-//    [super setSelected:selected animated:animated];
-//
-//}
-
-//- (void)setHighlighted:(BOOL)highlighted animated:(BOOL)animated
-//{
-//    [super setHighlighted:highlighted animated:animated];
-//
-//}
-
 - (void)layoutSubviews
 {
     [super layoutSubviews];
-    
+
     CGRect bounds = self.contentView.bounds;
-    
+
     [self.switchControl sizeToFit];
-    self.switchControl.frame = CGRectMake(CGRectGetWidth(bounds) - 14.0f - CGRectGetWidth(self.switchControl.frame),
-                                          CGRectGetMidY(self.textLabel.frame) - CGRectGetHeight(self.switchControl.frame) / 2.0f,
+    self.switchControl.frame = CGRectMake(CGRectGetWidth(bounds) - 14.0 - CGRectGetWidth(self.switchControl.frame),
+                                          CGRectGetMidY(bounds) - CGRectGetHeight(self.switchControl.frame) / 2.0,
                                           CGRectGetWidth(self.switchControl.frame),
                                           CGRectGetHeight(self.switchControl.frame));
+
+    if (CGRectGetMaxX(self.textLabel.frame) > CGRectGetMinX(self.switchControl.frame) - 7.0) {
+        CGFloat overlap = CGRectGetMinX(self.switchControl.frame) - 7.0 - CGRectGetMaxX(self.textLabel.frame);
+        self.textLabel.frame = UIEdgeInsetsInsetRect(self.textLabel.frame, UIEdgeInsetsMake(0.0, 0.0, 0.0, - overlap));
+    }
+
+    if (CGRectGetMaxX(self.detailTextLabel.frame) > CGRectGetMinX(self.switchControl.frame) - 7.0) {
+        CGFloat overlap = CGRectGetMinX(self.switchControl.frame) - 7.0 - CGRectGetMaxX(self.detailTextLabel.frame);
+        self.detailTextLabel.frame = UIEdgeInsetsInsetRect(self.detailTextLabel.frame, UIEdgeInsetsMake(0.0, 0.0, - CGRectGetHeight(self.detailTextLabel.frame), - overlap));
+    }
 }
-
-//- (void)prepareForReuse
-//{
-//    [super prepareForReuse];
-//
-//}
-
-#pragma mark - Memory management
-
-- (void)dealloc
-{
-    
-}
-
-#pragma mark - Private category implementation ()
 
 @end
