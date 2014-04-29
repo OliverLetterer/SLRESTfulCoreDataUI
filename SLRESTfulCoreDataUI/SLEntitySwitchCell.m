@@ -56,8 +56,14 @@
     }
 
     if (CGRectGetMaxX(self.detailTextLabel.frame) > CGRectGetMinX(self.switchControl.frame) - 7.0) {
-        CGFloat overlap = CGRectGetMinX(self.switchControl.frame) - 7.0 - CGRectGetMaxX(self.detailTextLabel.frame);
-        self.detailTextLabel.frame = UIEdgeInsetsInsetRect(self.detailTextLabel.frame, UIEdgeInsetsMake(0.0, 0.0, - CGRectGetHeight(self.detailTextLabel.frame), - overlap));
+        CGFloat availableWidth = CGRectGetMinX(self.switchControl.frame) - 7.0 - CGRectGetMinX(self.detailTextLabel.frame);
+        CGFloat availableHeight = CGRectGetHeight(bounds) - CGRectGetMinY(self.detailTextLabel.frame) - 7.0;
+
+        CGSize size = [self.detailTextLabel sizeThatFits:CGSizeMake(availableWidth, availableHeight)];
+
+        CGRect frame = self.detailTextLabel.frame;
+        frame.size = size;
+        self.detailTextLabel.frame = frame;
     }
 }
 
