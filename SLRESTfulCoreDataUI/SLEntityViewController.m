@@ -1061,7 +1061,7 @@ static void * SLEntityViewControllerAttributeDescriptionKey = &SLEntityViewContr
 
     switch (attributeDescription.attributeType) {
         case NSStringAttributeType:
-            return [self.entity valueForKey:attribute];
+            return [self.entity primitiveValueForKey:attribute];
             break;
         case NSInteger16AttributeType:
         case NSInteger32AttributeType:
