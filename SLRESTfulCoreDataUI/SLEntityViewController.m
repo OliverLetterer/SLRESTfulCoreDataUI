@@ -497,6 +497,7 @@ static void * SLEntityViewControllerAttributeDescriptionKey = &SLEntityViewContr
 {
     [super viewWillAppear:animated];
 
+    [self _updateVisibleSectionsAnimated:NO];
     [self.tableView reloadData];
 }
 
