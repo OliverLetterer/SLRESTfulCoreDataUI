@@ -430,8 +430,7 @@ static void * SLEntityViewControllerAttributeDescriptionKey = &SLEntityViewContr
         _entity = entity;
         _editingType = editingType;
 
-        self.entityDescription = [NSEntityDescription entityForName:NSStringFromClass(entity.class)
-                                             inManagedObjectContext:entity.managedObjectContext];
+        self.entityDescription = _entity.entity;
         NSParameterAssert(self.entityDescription);
 
         self.sections = @[];
