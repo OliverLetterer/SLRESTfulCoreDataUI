@@ -49,7 +49,8 @@
 @property (nonatomic, readonly) NSArray *options;
 @property (nonatomic, readonly) NSArray *values;
 @property (nonatomic, readonly) id currentValue;
+@property (nonatomic, readonly) NSString *attribute;
 
-- (id)initWithOptions:(NSArray *)options values:(NSArray *)values currentValue:(id)currentValue;
+- (id)initWithOptions:(NSArray *)options values:(NSArray *)values currentValue:(id)currentValue attribute:(NSString *)attribute;
 
 @end

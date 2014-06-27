@@ -658,7 +658,7 @@ static void * SLEntityViewControllerAttributeDescriptionKey = &SLEntityViewContr
 
             if (enumOptions && enumValues) {
                 if (enumOptions.count > 1) {
-                    SLSelectEnumAttributeViewController *viewController = [[SLSelectEnumAttributeViewController alloc] initWithOptions:enumOptions values:enumValues currentValue:[self.entity valueForKey:attributeDescription.name]];
+                    SLSelectEnumAttributeViewController *viewController = [[SLSelectEnumAttributeViewController alloc] initWithOptions:enumOptions values:enumValues currentValue:[self.entity valueForKey:attributeDescription.name] attribute:attributeDescription.name];
                     viewController.delegate = self;
                     viewController.title = self.propertyMapping[attributeDescription.name];
 
@@ -683,9 +683,6 @@ static void * SLEntityViewControllerAttributeDescriptionKey = &SLEntityViewContr
                         UIImageView *imageView = (UIImageView *)self.tableView.backgroundView;
                         viewController.tableView.backgroundView = [[UIImageView alloc] initWithImage:imageView.image];
                     }
-
-                    objc_setAssociatedObject(viewController, SLEntityViewControllerAttributeDescriptionKey,
-                                             attributeDescription, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 
                     [self.navigationController pushViewController:viewController animated:YES];
                     return;
@@ -1240,9 +1237,7 @@ static void * SLEntityViewControllerAttributeDescriptionKey = &SLEntityViewContr
 
 - (void)selectEnumAttributeViewController:(SLSelectEnumAttributeViewController *)viewController didSelectEnumValue:(id)enumValue
 {
-    NSAttributeDescription *attributeDescription = objc_getAssociatedObject(viewController, SLEntityViewControllerAttributeDescriptionKey);
-
-    [self.entity setValue:enumValue forKey:attributeDescription.name];
+    [self.entity setValue:enumValue forKey:viewController.attribute];
     [self _updateVisibleSectionsAnimated:NO];
 
     [self.navigationController popToViewController:self animated:YES];
@@ -1278,7 +1273,7 @@ static void * SLEntityViewControllerAttributeDescriptionKey = &SLEntityViewContr
     if (section.isExpandable && !section.isExpanded) {
         return;
     }
-    
+
     NSUInteger sectionIndex = [self indexPathForProperty:section.relationship].section;
 
     NSInteger rowOffset = 0;
@@ -1323,7 +1318,7 @@ static void * SLEntityViewControllerAttributeDescriptionKey = &SLEntityViewContr
             cell.textLabel.text = self.propertyMapping[staticSection.attribute];
 
             NSInteger index = [staticSection.values indexOfObject:[self.entity valueForKey:staticSection.attribute]];
-            
+
             if (index != NSNotFound) {
                 cell.detailTextLabel.text = staticSection.humanReadableOptions[index];
             } else {
@@ -1405,7 +1400,7 @@ static void * SLEntityViewControllerAttributeDescriptionKey = &SLEntityViewContr
             } else {
                 cell.backgroundView.backgroundColor = [UIColor whiteColor];
             }
-            
+
             return cell;
         }
 
@@ -1569,7 +1564,7 @@ static void * SLEntityViewControllerAttributeDescriptionKey = &SLEntityViewContr
         [self _updateVisibleSectionsAnimated:YES];
     } else {
         [self.entity setValue:thisEntity forKey:relationshipDescription.name];
-        
+
         if (dynamicSection.isExpandable) {
             dynamicSection.isExpanded = NO;
             originalSection.isExpanded = NO;
@@ -1765,7 +1760,7 @@ static void * SLEntityViewControllerAttributeDescriptionKey = &SLEntityViewContr
                     [deletedIndexPaths addObject:[NSIndexPath indexPathForRow:[previousVisibleProperties indexOfObject:property]
                                                                     inSection:previousVisibleSectionIndex]];
                 }
-
+                
                 for (NSString *property in visibleProperties) {
                     if ([previousVisibleProperties containsObject:property]) {
                         continue;

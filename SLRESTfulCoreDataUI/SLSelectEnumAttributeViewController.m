@@ -28,29 +28,22 @@
 
 
 
-@interface SLSelectEnumAttributeViewController () {
-    
-}
-
-@end
-
-
-
 @implementation SLSelectEnumAttributeViewController
 
 #pragma mark - setters and getters
 
 #pragma mark - Initialization
 
-- (id)initWithOptions:(NSArray *)options values:(NSArray *)values currentValue:(id)currentValue
+- (id)initWithOptions:(NSArray *)options values:(NSArray *)values currentValue:(id)currentValue attribute:(NSString *)attribute
 {
     if (self = [super initWithStyle:UITableViewStylePlain]) {
         _options = options;
         _values = values;
         _currentValue = currentValue;
-        
+        _attribute = attribute;
+
         NSAssert(_options.count == _values.count, @"options and values dont have same length");
-        
+
         if ([self respondsToSelector:@selector(setRestorationIdentifier:)]) {
             self.restorationIdentifier = NSStringFromClass(self.class);
             self.restorationClass = self.class;
@@ -64,7 +57,7 @@
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
-    
+
 }
 
 #pragma mark - View lifecycle
@@ -72,17 +65,17 @@
 //- (void)loadView
 //{
 //    [super loadView];
-//    
+//
 //}
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
-    
+
     UIView *tableFooterView = [[UIView alloc] initWithFrame:CGRectMake(0.0f, 0.0f, 0.0f, 1.0f)];
     tableFooterView.backgroundColor = [UIColor clearColor];
     self.tableView.tableFooterView = tableFooterView;
-    
+
     if ([self.tableView respondsToSelector:@selector(setRestorationIdentifier:)]) {
         self.tableView.restorationIdentifier = NSStringFromClass(self.tableView.class);
     }
@@ -91,31 +84,31 @@
 - (void)viewDidUnload
 {
     [super viewDidUnload];
-    
+
 }
 
 - (void)viewWillAppear:(BOOL)animated
 {
     [super viewWillAppear:animated];
-    
+
 }
 
 - (void)viewDidAppear:(BOOL)animated
 {
     [super viewDidAppear:animated];
-    
+
 }
 
 - (void)viewWillDisappear:(BOOL)animated
 {
     [super viewWillDisappear:animated];
-    
+
 }
 
 - (void)viewDidDisappear:(BOOL)animated
 {
     [super viewDidDisappear:animated];
-    
+
 }
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
@@ -153,21 +146,21 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
     static NSString *CellIdentifier = @"SLEntityTableViewCell";
-    
+
     SLEntityTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier];
     if (cell == nil) {
         cell = [[SLEntityTableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:CellIdentifier];
     }
-    
+
     cell.textLabel.text = self.options[indexPath.row];
-    
+
     if ([self.currentValue isEqual:self.values[indexPath.row]]) {
         cell.accessoryType = UITableViewCellAccessoryCheckmark;
     } else {
         cell.accessoryType = UITableViewCellAccessoryNone;
     }
-    
-    
+
+
     return cell;
 }
 
@@ -184,16 +177,16 @@
 //    if (editingStyle == UITableViewCellEditingStyleDelete) {
 //        // Delete the row from the data source
 //        [tableView deleteRowsAtIndexPaths:[NSArray arrayWithObject:indexPath] withRowAnimation:UITableViewRowAnimationFade];
-//    }   
+//    }
 //    else if (editingStyle == UITableViewCellEditingStyleInsert) {
 //        // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-//    }   
+//    }
 //}
 
 // Override to support rearranging the table view.
 //- (void)tableView:(UITableView *)tableView moveRowAtIndexPath:(NSIndexPath *)fromIndexPath toIndexPath:(NSIndexPath *)toIndexPath
 //{
-//    
+//
 //}
 
 // Override to support conditional rearranging of the table view.
@@ -208,7 +201,7 @@
 - (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 {
     _currentValue = self.values[indexPath.row];
-    
+
     [tableView reloadData];
     [self.delegate selectEnumAttributeViewController:self didSelectEnumValue:_currentValue];
 }
@@ -225,13 +218,13 @@
 - (void)encodeRestorableStateWithCoder:(NSCoder *)coder
 {
     [super encodeRestorableStateWithCoder:coder];
-    
+
 }
 
 - (void)decodeRestorableStateWithCoder:(NSCoder *)coder
 {
     [super decodeRestorableStateWithCoder:coder];
-    
+
 }
 
 #pragma mark - UIDataSourceModelAssociation
@@ -239,9 +232,9 @@
 - (NSString *)modelIdentifierForElementAtIndexPath:(NSIndexPath *)indexPath inView:(UIView *)view
 {
     if (indexPath) {
-        
+
     }
-    
+
     return nil;
 }
 
