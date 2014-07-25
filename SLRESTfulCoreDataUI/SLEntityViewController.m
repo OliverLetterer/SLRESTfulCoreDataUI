@@ -649,6 +649,7 @@ static void * SLEntityViewControllerAttributeDescriptionKey = &SLEntityViewContr
                     [cell.switchControl setOn:[[self.entity valueForKey:attributeDescription.name] boolValue] animated:YES];
                 }
 
+                [tableView deselectRowAtIndexPath:indexPath animated:NO];
                 [self _updateVisibleSectionsAnimated:YES];
                 return;
             }
