@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
   spec.name         = 'SLRESTfulCoreDataUI'
-  spec.version      = '1.11.9'
+  spec.version      = '1.11.10'
   spec.platform     = :ios, '7.0'
   spec.license      = 'MIT'
   spec.source       = { :git => 'https://github.com/OliverLetterer/SLRESTfulCoreDataUI.git', :tag => spec.version.to_s }
@@ -12,4 +12,7 @@ Pod::Spec.new do |spec|
   spec.author       = { 'Oliver Letterer' => 'oliver.letterer@gmail.com' }
 
   spec.dependency   'SLRESTfulCoreData', '>= 1.0.0'
+
+  spec.deprecated = true
+  spec.deprecated_in_favor_of = "CBRManagedObjectFormViewController"
 end
